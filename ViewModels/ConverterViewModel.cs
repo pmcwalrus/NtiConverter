@@ -18,11 +18,11 @@ namespace NtiConverter.ViewModels
         public ConverterViewModel()
         {
             Reader = new XlsxReader();
-            OpenXlsxFileCmd = new RelayCommand(() => OpenXlsxFile());
+            OpenXlsxFileCmd = new RelayCommand(() => SelectAndOpenXlsxFile());
         }
 
         public ICommand OpenXlsxFileCmd { get; }
-        private void OpenXlsxFile()
+        private void SelectAndOpenXlsxFile()
         {
             var ofd = new OpenFileDialog
             {
@@ -30,12 +30,16 @@ namespace NtiConverter.ViewModels
             };
             var dRes = ofd.ShowDialog();
             if (!dRes.HasValue || !dRes.Value) return;
-            var reader = new XlsxReader();
+            OpenXlsxFile(ofd.FileName);
+        }
+
+        public void OpenXlsxFile(string fileName)
+        {
             try
             {
-                reader.OpenFile(ofd.FileName);
+                Reader.OpenFile(fileName);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show(e.Message, "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
             }

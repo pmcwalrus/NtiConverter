@@ -9,10 +9,12 @@
                   xmlns:views="clr-namespace:NtiConverter.Views"
                   WindowStartupLocation="CenterScreen"
                   mc:Ignorable="d"
-                  Title="MainWindow" Height="450" Width="800">
+                  Title="MainWindow" Height="450" Width="800"
+                  Drop="MetroWindow_Drop"
+                  AllowDrop="True">
     <mah:MetroWindow.DataContext>
         <viewmodels:ConverterViewModel/>
-    </mah:MetroWindow.DataContext>
+    </mah:MetroWindow.DataContext>    
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
             <Button ToolTip="Открыть XLSX-документ"
