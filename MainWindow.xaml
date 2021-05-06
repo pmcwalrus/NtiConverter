@@ -5,13 +5,18 @@
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:viewmodels="clr-namespace:NtiConverter.ViewModels"
                   xmlns:views="clr-namespace:NtiConverter.Views"
                   WindowStartupLocation="CenterScreen"
                   mc:Ignorable="d"
                   Title="MainWindow" Height="450" Width="800">
+    <mah:MetroWindow.DataContext>
+        <viewmodels:ConverterViewModel/>
+    </mah:MetroWindow.DataContext>
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
-            <Button ToolTip="Открыть XLSX-документ">
+            <Button ToolTip="Открыть XLSX-документ"
+                    Command="{Binding OpenXlsxFileCmd}">
                 <Button.Content>
                     <iconPacks:BoxIcons Kind="SolidFolderOpen"/>
                 </Button.Content>

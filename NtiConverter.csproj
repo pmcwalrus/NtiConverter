@@ -8,12 +8,16 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.4.5" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\TestSolution\Vab.WpfCommands\Vab.WpfCommands\Vab.WpfCommands.csproj" />
+    <ProjectReference Include="..\Nti.XlsxReader\Nti.XlsxReader.csproj" />
   </ItemGroup>
 
 </Project>
