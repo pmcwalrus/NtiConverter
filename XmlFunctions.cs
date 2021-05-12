@@ -1,5 +1,4 @@
 ﻿using Nti.XlsxReader.Types;
-using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -27,6 +26,7 @@ namespace NtiConverter
         {
             var sb = new StringBuilder();
             sb.AppendLine(data.XmlTop);
+            sb.Append(GetModbusDevices(data));
             sb.Append(GetWorkstations(data));
             sb.Append(data.XmlBot);
             return sb.ToString();
@@ -49,6 +49,27 @@ namespace NtiConverter
                 sb.AppendLine($"\t\t<connection host=\"{ws.Network2}\" port=\"50201\" " +
                      $"parm=\"{ws.DeviceName}_con1\" iface=\"{ws.IFace2}\"/>");
                 sb.AppendLine("\t</workstation>");
+                sb.Append("\r\n");
+            }
+            return sb.ToString();
+        }
+
+        public static string GetModbusDevices(NtiBase data)
+        {
+            var sb = new StringBuilder();
+            var devices = data.Ip.Where(x => x.DeviceType == DeviceType.Device).ToList();
+            foreach(var device in devices)
+            {
+                sb.AppendLine($"\t<device name=\"{device.DeviceName}\" " +
+                    $"protocol=\"MODBUS-TCP\" address_offset=\"0\" " +
+                    $"check_timeout_min=\"1\">");
+                sb.AppendLine($"\t\t<connection host=\"{device.Network1}\" " +
+                    $"port=\"502\" " +
+                    $"parm=\"{device.DeviceName}_con1\"/>");
+                sb.AppendLine($"\t\t<connection host=\"{device.Network2}\" " +
+                    $"port=\"502\" " +
+                    $"parm=\"{device.DeviceName}_con2\"/>");
+                sb.AppendLine("\t</device>");
                 sb.Append("\r\n");
             }
             return sb.ToString();
