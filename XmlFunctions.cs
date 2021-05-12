@@ -1,5 +1,7 @@
 ﻿using Nti.XlsxReader.Types;
+using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace NtiConverter
@@ -21,12 +23,34 @@ namespace NtiConverter
             }
         }
 
-        private static string GetFileData(NtiBase data)
+        public static string GetFileData(NtiBase data)
         {
             var sb = new StringBuilder();
-            sb.Append(data.XmlTop);
+            sb.AppendLine(data.XmlTop);
+            sb.Append(GetWorkstations(data));
             sb.Append(data.XmlBot);
-            throw new NotImplementedException();
+            return sb.ToString();
+        }
+
+        public static string GetWorkstations(NtiBase data)
+        {
+            var sb = new StringBuilder();
+            var workstations = data.Ip.Where(x => x.DeviceType == DeviceType.Worstation).ToList();
+            foreach (var ws in workstations)
+            {
+                sb.AppendLine($"\t<workstation name=\"{ws.DeviceName}\"  " +
+                    $"priority=\"{ws.Priority}\" " +
+                    $"registrator=\"{ws.Registrator}\" " +
+                    $"registrator_timeout=\"{ws.RegistartorTimeout}\" " +
+                    $"force_start=\"false\" " +
+                    $"parm_poweroff=\"{ws.DeviceName}_poweroff\">");
+                sb.AppendLine($"\t\t<connection host=\"{ws.Network1}\" port=\"50201\" " +
+                    $"parm=\"{ws.DeviceName}_con1\" iface=\"{ws.IFace1}\"/>");
+                sb.AppendLine($"\t\t<connection host=\"{ws.Network2}\" port=\"50201\" " +
+                     $"parm=\"{ws.DeviceName}_con1\" iface=\"{ws.IFace2}\"/>");
+                sb.AppendLine("\t</workstation>");
+                sb.Append("\r\n");
+            }
             return sb.ToString();
         }
     }

@@ -54,7 +54,7 @@ namespace NtiConverter.ViewModels
 
         public ICommand SaveXmlCmd { get; }
         private void SaveXml()
-        {
+        {            
             var sfd = new SaveFileDialog
             {
                 DefaultExt = "xml",
