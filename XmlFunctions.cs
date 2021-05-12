@@ -27,6 +27,7 @@ namespace NtiConverter
         {
             var sb = new StringBuilder();
             sb.AppendLine(data.XmlTop);
+            sb.AppendLine(data.AddShmems);
             sb.AppendLine(GetShemms(data));
             sb.Append(GetModbusDevices(data));
             sb.Append(GetWorkstations(data));
