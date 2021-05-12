@@ -19,7 +19,10 @@ namespace NtiConverter.ViewModels
         {
             Reader = new XlsxReader();
             OpenXlsxFileCmd = new RelayCommand(() => SelectAndOpenXlsxFile());
+            SaveXmlCmd = new RelayCommand(() => SaveXml());
         }
+
+        #region Select XLSX
 
         public ICommand OpenXlsxFileCmd { get; }
         private void SelectAndOpenXlsxFile()
@@ -44,6 +47,25 @@ namespace NtiConverter.ViewModels
                 MessageBox.Show(e.Message, "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        #endregion
+
+        #region Create XML
+
+        public ICommand SaveXmlCmd { get; }
+        private void SaveXml()
+        {
+            var sfd = new SaveFileDialog
+            {
+                DefaultExt = "xml",
+                AddExtension = true
+            };
+            var dialogRes = sfd.ShowDialog();
+            if (!dialogRes.HasValue || !dialogRes.Value) return;
+            XmlFunctions.SaveXml(DataBase, sfd.FileName);
+        }
+
+        #endregion
 
         #region PropertyChanged Impllementation
 

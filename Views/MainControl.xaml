@@ -21,7 +21,9 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0"
-                        Content="Открыть XLSX-файл"/>
+                        Content="Сформировать XML"
+                        IsEnabled="{Binding Reader.BaseParsed}"
+                        Command="{Binding SaveXmlCmd}"/>
             </Grid>
         </GroupBox>
         <TabControl Grid.Row="0"
