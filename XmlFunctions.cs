@@ -1,5 +1,6 @@
 ﻿using Nti.XlsxReader.Types;
-using System;
+using System.IO;
+using System.Text;
 
 namespace NtiConverter
 {
@@ -11,9 +12,22 @@ namespace NtiConverter
         /// <param name="data">NTI-database for convertion</param>
         /// <param name="fileName">File name to save</param>
         /// <returns></returns>
-        public static bool SaveXml(NtiBase data, string fileName)
+        public static void SaveXml(NtiBase data, string fileName)
         {
+            var xmlData = GetFileData(data);
+            using (var sw = new StreamWriter(fileName) { AutoFlush = true })
+            {
+                sw.Write(xmlData);
+            }
+        }
+
+        private static string GetFileData(NtiBase data)
+        {
+            var sb = new StringBuilder();
+            sb.Append(data.XmlTop);
+            sb.Append(data.XmlBot);
             throw new NotImplementedException();
+            return sb.ToString();
         }
     }
 }
