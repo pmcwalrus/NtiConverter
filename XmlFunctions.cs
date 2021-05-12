@@ -16,10 +16,8 @@ namespace NtiConverter
         public static void SaveXml(NtiBase data, string fileName)
         {
             var xmlData = GetFileData(data);
-            using (var sw = new StreamWriter(fileName) { AutoFlush = true })
-            {
-                sw.Write(xmlData);
-            }
+            using var sw = new StreamWriter(fileName) { AutoFlush = true };
+            sw.Write(xmlData);
         }
 
         public static string GetFileData(NtiBase data)
@@ -69,6 +67,9 @@ namespace NtiConverter
                 sb.AppendLine($"\t\t<connection host=\"{device.Network2}\" " +
                     $"port=\"502\" " +
                     $"parm=\"{device.DeviceName}_con2\"/>");
+                var addition = data.DeviceAdds.FirstOrDefault(x => x.DeviceName == device.DeviceName);
+                if (addition != null)
+                    sb.AppendLine(addition.Addition);
                 sb.AppendLine("\t</device>");
                 sb.Append("\r\n");
             }
