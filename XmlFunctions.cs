@@ -66,58 +66,126 @@ namespace NtiConverter
         public static string GetPusOaps(NtiBase data)
         {
             var sb = new StringBuilder();
+            var skList = new List<string>();
             sb.AppendLine("\t<shmem name=\"nsc-pus-OAPS-write\" stale_timeout=\"45000\">");
             foreach (var ups in data.Ups)
             {
-                var parmsString = string.Empty;
-                var parms = data.Signals.Where(x => x.Ups == ups.Id);
-                foreach (var parm in parms)
-                {
-                    if (parm.Type == SignalTypes.Alarm || parm.Type == SignalTypes.CritcalAlarm)
-                        parmsString += string.IsNullOrEmpty(parmsString)
-                            ? $"{parm.SystemId}_{parm.SignalId} "
-                            : $"| {parm.SystemId}_{parm.SignalId} ";
-                    if (parm.Is420mA)
-                        parmsString += string.IsNullOrEmpty(parmsString)
-                            ? $"{parm.SystemId}_{parm.SignalId}_f0 "
-                            : $"| {parm.SystemId}_{parm.SignalId}_f0 ";
-                    if (parm.SetpointTypes != null)
-                    {
-                        foreach (var sp in parm.SetpointTypes)
-                        {
-                            string suffix;
-                            switch (sp)
-                            {
-                                case SetpointTypes.LL:
-                                    suffix = "LL";
-                                    break;
-                                case SetpointTypes.L:
-                                    suffix = "L";
-                                    break;
-                                case SetpointTypes.H:
-                                    suffix = "H";
-                                    break;
-                                case SetpointTypes.HH:
-                                    suffix = "HH";
-                                    break;
-                                default:
-                                    suffix = "???";
-                                    break;
-                            }
-                            parmsString += string.IsNullOrEmpty(parmsString)
-                                ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
-                                : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
-                        }
-                    }
-                }
-                var script = string.IsNullOrEmpty(parmsString)
-                    ? string.Empty
-                    : $"script=\"{parmsString}\"";
-                sb.AppendLine($"\t\t<parm name=\"UPS_{ups.Id}\" " +
-                    $"type=\"int\" {script} description=\"{ups.Group}\"/>");
+                sb.AppendLine(GetUps(data, ups));
+                if (!skList.Contains(ups.AlarmGroup))
+                    skList.Add(ups.AlarmGroup);
             }
+            foreach (var sk in skList)
+            {
+                sb.AppendLine(GetSk(data, sk));
+            }
+            foreach (var sk in skList)
+            {
+                sb.AppendLine($"\t\t<parm name=\"SK_{sk}_alarm\" type=\"bool\" " +
+                    $"script=\"set_PUS(get_alarms(SK_{sk}), SK_{sk}_alarm_btn)\"/>");
+            }
+            foreach (var sk in skList)
+            {
+                sb.AppendLine($"\t\t<parm name=\"SK_{sk}_ack\" type=\"bool\" " +
+                    $"script=\"set_PUS(get_alarms_ack(SK_{sk}), SK_{sk}_ack_btn)\"/>");
+            }
+            foreach (var ups in data.Ups)
+            {
+                sb.AppendLine($"\t\t<parm name=\"UPS_{ups.Id}_alarm\" type=\"bool\" " +
+                    $"script=\"set_PUS(get_alarms(UPS_{ups.Id}), UPS_{ups.Id}_alarm_btn)\"/>");
+            }
+            foreach (var ups in data.Ups)
+            {
+                sb.AppendLine($"\t\t<parm name=\"UPS_{ups.Id}_ack\" type=\"bool\" " +
+                    $"script=\"set_PUS(get_alarms_ack(UPS_{ups.Id}), UPS_{ups.Id}_ack_btn)\"/>");
+            }
+            foreach (var ups in data.Ups)
+            {
+                sb.AppendLine($"\t\t<parm name=\"UPS_{ups.Id}_cmd\" type=\"int\" " +
+                    $"script=\"set_OAPS(UPS_{ups.Id}_alarm, UPS_{ups.Id}_ack)\"/>");
+            }
+            sb.AppendLine(GetStaticDataPusOaps());
+            var skScript = string.Empty;
+            foreach (var sk in skList)
+            {
+                skScript += string.IsNullOrEmpty(skScript)
+                    ? $"SK_{sk} "
+                    : $"| SK_{sk} ";
+            }
+            sb.AppendLine("\t\t<parm name=\"sound_on\" type=\"bool\" description=\"Звук РСТ\" " +
+                $"script=\"get_alarms_not_ack({skScript})\"/>");
             sb.AppendLine("\t<shmem>");
             return sb.ToString();
+        }
+
+        public static string GetStaticDataPusOaps()
+        {
+            return "\t\t<parm name=\"kdmp_auto_on\" type=\"int\" description=\"Автовключение КДМП по параметру АПС\"/>\r\n" +
+            "\t\t<parm name=\"autokdmp_impulse\" type=\"bool\" script=\"get_alarms_not_ack(kdmp_auto_on) &amp;&amp; SYS_new_alarm\"/>\r\n" +
+		    "\t\t<parm name=\"autokdmp_alarm\" type=\"alarm\" script=\"autokdmp_impulse\" description=\"Сработало автовключение КДМП по АПС механической установки\"/>\r\n" +
+  		    "\t\t<parm name=\"btn_mute\" type=\"bool\"/>\r\n" +                                
+            "\t\t<parm name=\"mute_sound\" type=\"bool\" script=\"alg.reset_after_timeout('mute', qs_mute_fn(SYS_new_alarm, btn_mute, mute_sound), 30000)\"/>";
+        }
+
+        public static string GetUps(NtiBase data, UpsEntity ups)
+        {
+            var parmsString = string.Empty;
+            var parms = data.Signals.Where(x => x.Ups == ups.Id);
+            foreach (var parm in parms)
+            {
+                if (parm.Type == SignalTypes.Alarm || parm.Type == SignalTypes.CritcalAlarm)
+                    parmsString += string.IsNullOrEmpty(parmsString)
+                        ? $"{parm.SystemId}_{parm.SignalId} "
+                        : $"| {parm.SystemId}_{parm.SignalId} ";
+                if (parm.Is420mA)
+                    parmsString += string.IsNullOrEmpty(parmsString)
+                        ? $"{parm.SystemId}_{parm.SignalId}_f0 "
+                        : $"| {parm.SystemId}_{parm.SignalId}_f0 ";
+                if (parm.SetpointTypes != null)
+                {
+                    foreach (var sp in parm.SetpointTypes)
+                    {
+                        string suffix;
+                        switch (sp)
+                        {
+                            case SetpointTypes.LL:
+                                suffix = "LL";
+                                break;
+                            case SetpointTypes.L:
+                                suffix = "L";
+                                break;
+                            case SetpointTypes.H:
+                                suffix = "H";
+                                break;
+                            case SetpointTypes.HH:
+                                suffix = "HH";
+                                break;
+                            default:
+                                suffix = "???";
+                                break;
+                        }
+                        parmsString += string.IsNullOrEmpty(parmsString)
+                            ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
+                            : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
+                    }
+                }
+            }
+            var script = string.IsNullOrEmpty(parmsString)
+                ? string.Empty
+                : $"script=\"{parmsString}\"";
+            return $"\t\t<parm name=\"UPS_{ups.Id}\" type=\"int\" {script} description=\"{ups.Group}\"/>";
+        }
+
+        public static string GetSk(NtiBase data, string sk)
+        {
+            var window = data.Ups.FirstOrDefault(x => x.AlarmGroup == sk).Window;
+            string upsString = string.Empty;
+            foreach(var ups in data.Ups.Where(x => x.AlarmGroup == sk))
+            {
+                upsString += string.IsNullOrEmpty(upsString)
+                        ? $"UPS_{ups.Id} "
+                        : $"| UPS_{ups.Id} ";
+            }
+            return $"\t\t<parm name=\"SK_{sk}\" type=\"int\" script=\"{upsString}\" description=\"{window}\"/>";
         }
 
         public static string GetWorkstations(NtiBase data)
