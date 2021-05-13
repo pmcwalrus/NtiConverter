@@ -27,6 +27,7 @@ namespace NtiConverter
             var sb = new StringBuilder();
             sb.AppendLine(data.XmlTop);
             sb.AppendLine(data.AddShmems);
+            sb.AppendLine(GetPusOaps(data));
             sb.AppendLine(GetConnections(data));
             sb.AppendLine(GetShemms(data));
             sb.Append(GetModbusDevices(data));
@@ -59,6 +60,63 @@ namespace NtiConverter
                     $"type=\"bool\" description=\"Выключение станции {device.Device}\"/>");
             }
             sb.AppendLine("\t</shmem>");
+            return sb.ToString();
+        }
+
+        public static string GetPusOaps(NtiBase data)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("\t<shmem name=\"nsc-pus-OAPS-write\" stale_timeout=\"45000\">");
+            foreach (var ups in data.Ups)
+            {
+                var parmsString = string.Empty;
+                var parms = data.Signals.Where(x => x.Ups == ups.Id);
+                foreach (var parm in parms)
+                {
+                    if (parm.Type == SignalTypes.Alarm || parm.Type == SignalTypes.CritcalAlarm)
+                        parmsString += string.IsNullOrEmpty(parmsString)
+                            ? $"{parm.SystemId}_{parm.SignalId} "
+                            : $"| {parm.SystemId}_{parm.SignalId} ";
+                    if (parm.Is420mA)
+                        parmsString += string.IsNullOrEmpty(parmsString)
+                            ? $"{parm.SystemId}_{parm.SignalId}_f0 "
+                            : $"| {parm.SystemId}_{parm.SignalId}_f0 ";
+                    if (parm.SetpointTypes != null)
+                    {
+                        foreach (var sp in parm.SetpointTypes)
+                        {
+                            string suffix;
+                            switch (sp)
+                            {
+                                case SetpointTypes.LL:
+                                    suffix = "LL";
+                                    break;
+                                case SetpointTypes.L:
+                                    suffix = "L";
+                                    break;
+                                case SetpointTypes.H:
+                                    suffix = "H";
+                                    break;
+                                case SetpointTypes.HH:
+                                    suffix = "HH";
+                                    break;
+                                default:
+                                    suffix = "???";
+                                    break;
+                            }
+                            parmsString += string.IsNullOrEmpty(parmsString)
+                                ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
+                                : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
+                        }
+                    }
+                }
+                var script = string.IsNullOrEmpty(parmsString)
+                    ? string.Empty
+                    : $"script=\"{parmsString}\"";
+                sb.AppendLine($"\t\t<parm name=\"UPS_{ups.Id}\" " +
+                    $"type=\"int\" {script} description=\"{ups.Group}\"/>");
+            }
+            sb.AppendLine("\t<shmem>");
             return sb.ToString();
         }
 
