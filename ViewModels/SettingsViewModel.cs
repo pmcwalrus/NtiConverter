@@ -1,10 +1,13 @@
-﻿using System.ComponentModel;
+﻿using NtiConverter.Models;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace NtiConverter.ViewModels
 {
     internal class SettingsViewModel : INotifyPropertyChanged
     {
+        public ReaderSettings Settings { get; }
+
         #region PropertyChanged Impllementation
 
         public event PropertyChangedEventHandler PropertyChanged;
