@@ -172,6 +172,13 @@ namespace NtiConverter
             sb.AppendLine($"\t\t<parm name=\"{paramName}\" " +
                 $"type=\"{param.TypeString}\" {inverted} {alarmGroup}" +
                 $"description=\"{param.Description}\"/>");
+            if (param.Is420mA)
+            {
+                var f0String = $"\t\t<parm name=\"{paramName}_f0\" " +
+                    $"type=\"alarm\" delay_on=\"3\" script=\"({paramName} &lt; -1250) || ({paramName} &gt; 11250)\"  " +
+                    $"{alarmGroup}description=\"Отказ датчика {param.Description}\"/>";
+                sb.AppendLine(f0String);
+            }
             if (!string.IsNullOrWhiteSpace(param.Units))
             {
                 var unitsString = $"\t\t<parm name=\"{paramName}_u\" type=\"{param.TypeString}\" " +
