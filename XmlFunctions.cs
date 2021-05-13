@@ -1,6 +1,5 @@
 ﻿using Nti.XlsxReader.Entities;
 using Nti.XlsxReader.Types;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,10 +27,38 @@ namespace NtiConverter
             var sb = new StringBuilder();
             sb.AppendLine(data.XmlTop);
             sb.AppendLine(data.AddShmems);
+            sb.AppendLine(GetConnections(data));
             sb.AppendLine(GetShemms(data));
             sb.Append(GetModbusDevices(data));
             sb.Append(GetWorkstations(data));
             sb.Append(data.XmlBot);
+            return sb.ToString();
+        }
+
+        public static string GetConnections(NtiBase data)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("\t<shmem name=\"nsc-dev-connection\" keepalive=\"true\">");
+            foreach (var device in data.Ip)
+            {
+                sb.AppendLine($"\t\t<parm name=\"{device.DeviceName}_con1\" type=\"int\"/>");
+                sb.AppendLine($"\t\t<parm name=\"{device.DeviceName}_con2\" type=\"int\"/>");
+            }
+            foreach (var device in data.Ip)
+            {
+                sb.AppendLine($"\t\t<parm name=\"{device.DeviceName}_nc1\" " +
+                    $"type=\"alarm\" script=\"{device.DeviceName}_con1 &lt; 704\" delay_on=\"5000\" " +
+                    $"description=\"Нет связи с {device.Device} по сети 1\"/>");
+                sb.AppendLine($"\t\t<parm name=\"{device.DeviceName}_nc2\" " +
+                    $"type=\"alarm\" script=\"{device.DeviceName}_con2 &lt; 704\" delay_on=\"5000\" " +
+                    $"description=\"Нет связи с {device.Device} по сети 2\"/>");
+            }
+            foreach(var device in data.Ip.Where(x => x.DeviceType == DeviceType.Worstation))
+            {
+                sb.AppendLine($"\t\t<parm name=\"{device.DeviceName}_poweroff\" " +
+                    $"type=\"bool\" description=\"Выключение станции {device.Device}\"/>");
+            }
+            sb.AppendLine("\t</shmem>");
             return sb.ToString();
         }
 
