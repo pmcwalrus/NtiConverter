@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Nti.XlsxReader;
 using Nti.XlsxReader.Types;
+using NtiConverter.Views;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -20,6 +21,7 @@ namespace NtiConverter.ViewModels
             Reader = new XlsxReader();
             OpenXlsxFileCmd = new RelayCommand(() => SelectAndOpenXlsxFile());
             SaveXmlCmd = new RelayCommand(() => SaveXml());
+            ShowSettingsWindowCmd = new RelayCommand(() => ShowSettingsWindow());
         }
 
         #region Select XLSX
@@ -46,6 +48,13 @@ namespace NtiConverter.ViewModels
             {
                 MessageBox.Show(e.Message, "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        public ICommand ShowSettingsWindowCmd { get; }
+        private void ShowSettingsWindow()
+        {
+            var win = new SettingsWindow();
+            win.ShowDialog();
         }
 
         #endregion

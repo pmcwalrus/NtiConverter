@@ -9,7 +9,7 @@
                   xmlns:views="clr-namespace:NtiConverter.Views"
                   WindowStartupLocation="CenterScreen"
                   mc:Ignorable="d"
-                  Title="MainWindow" Height="450" Width="800"
+                  Title="NTI Converter" Height="450" Width="800"
                   Drop="MetroWindow_Drop"
                   AllowDrop="True">
     <mah:MetroWindow.DataContext>
@@ -21,6 +21,12 @@
                     Command="{Binding OpenXlsxFileCmd}">
                 <Button.Content>
                     <iconPacks:BoxIcons Kind="SolidFolderOpen"/>
+                </Button.Content>
+            </Button>
+            <Button ToolTip="Настройки"
+                    Command="{Binding ShowSettingsWindowCmd}">
+                <Button.Content>
+                    <iconPacks:BoxIcons Kind="SolidCog"/>
                 </Button.Content>
             </Button>
         </mah:WindowCommands>
