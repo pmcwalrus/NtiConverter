@@ -21,9 +21,15 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0"
+                        Margin="5"
                         Content="Сформировать XML"
                         IsEnabled="{Binding Reader.BaseParsed}"
                         Command="{Binding SaveXmlCmd}"/>
+                <Button Grid.Row="1"
+                        Margin="5"
+                        Content="Анализ XML"
+                        IsEnabled="True"
+                        Command="{Binding AnalyzeXmlCmd}"/>
             </Grid>
         </GroupBox>
         <TabControl Grid.Row="0"
@@ -31,8 +37,17 @@
                     Margin="5"
                     Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
             <TabItem Header="Перечень"
-                     mah:HeaderedControlHelper.HeaderFontSize="25">
+                     mah:HeaderedControlHelper.HeaderFontSize="22">
                 <local:SignalViewerControl/>
+            </TabItem>
+            <TabItem Header="Анализ alarm'ов"
+                     mah:HeaderedControlHelper.HeaderFontSize="22">
+                <TextBox Margin="5"
+                         IsReadOnly="True"
+                         VerticalContentAlignment="Top"
+                         HorizontalContentAlignment="Left"
+                         VerticalScrollBarVisibility="Auto"
+                         Text="{Binding XmlAlarmAnalyzeResult}"/>
             </TabItem>
         </TabControl>
     </Grid>

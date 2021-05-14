@@ -22,6 +22,7 @@ namespace NtiConverter.ViewModels
             OpenXlsxFileCmd = new RelayCommand(() => SelectAndOpenXlsxFile());
             SaveXmlCmd = new RelayCommand(() => SaveXml());
             ShowSettingsWindowCmd = new RelayCommand(() => ShowSettingsWindow());
+            AnalyzeXmlCmd = new RelayCommand(() => AnalyzeXml());
         }
 
         #region Select XLSX
@@ -46,7 +47,8 @@ namespace NtiConverter.ViewModels
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}",
+                    "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -70,11 +72,51 @@ namespace NtiConverter.ViewModels
                 AddExtension = true
             };
             var dialogRes = sfd.ShowDialog();
-            if (!dialogRes.HasValue || !dialogRes.Value) return;
-            XmlFunctions.SaveXml(DataBase, sfd.FileName);
+            if (!dialogRes.HasValue || !dialogRes.Value) return;            
+            try
+            {
+                XmlFunctions.SaveXml(DataBase, sfd.FileName);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}",
+                    "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         #endregion
+
+        private string _xmlAlarmAnalyzeResult;
+        public string XmlAlarmAnalyzeResult
+        {
+            get => _xmlAlarmAnalyzeResult;
+            set
+            {
+                _xmlAlarmAnalyzeResult = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand AnalyzeXmlCmd { get; }
+        private void AnalyzeXml()
+        {
+            XmlAlarmAnalyzeResult = string.Empty;
+            var ofd = new OpenFileDialog
+            {
+                Filter = "XML | *.xml"
+            };
+            var dRes = ofd.ShowDialog();
+            if (!dRes.HasValue || !dRes.Value) return;
+            try
+            {
+                XmlAlarmAnalyzeResult = XmlFunctions.AnalyzeXml(ofd.FileName);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}", 
+                    "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         #region PropertyChanged Impllementation
 

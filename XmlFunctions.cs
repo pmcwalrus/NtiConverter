@@ -1,9 +1,11 @@
 ﻿using Nti.XlsxReader.Entities;
 using Nti.XlsxReader.Types;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace NtiConverter
 {
@@ -113,7 +115,7 @@ namespace NtiConverter
             }
             sb.AppendLine("\t\t<parm name=\"sound_on\" type=\"bool\" description=\"Звук РСТ\" " +
                 $"script=\"get_alarms_not_ack({skScript})\"/>");
-            sb.AppendLine("\t<shmem>");
+            sb.AppendLine("\t</shmem>");
             return sb.ToString();
         }
 
@@ -383,5 +385,88 @@ namespace NtiConverter
             }
             return sb.ToString();
         }
+
+        #region XML Analyze
+
+        public static string AnalyzeXml(string fileName)
+        {
+            using var sr = new StreamReader(fileName);
+            var fileData = sr.ReadToEnd();
+            var xmlData = XDocument.Parse(fileData);
+            var sb = new StringBuilder();
+            var parms = xmlData.Descendants("parm").ToList();
+            var alarms = parms.Where(
+                x => (string)x.Attribute("type") == "alarm"
+                || (string)x.Attribute("type") == "critical_alarm").ToList();
+            var ups = parms.Where(x => ((string)x.Attribute("name")).StartsWith("UPS_", StringComparison.OrdinalIgnoreCase)
+                && ((string)x.Attribute("name")).Count(c => c == '_') == 1).ToList();
+            var upsWithScripts = ups.Where(x => !string.IsNullOrWhiteSpace((string)x.Attribute("script"))).ToList();
+            var forms = parms.Where(x => ((string)x.Attribute("name")).StartsWith("form_", StringComparison.OrdinalIgnoreCase)
+                && ((string)x.Attribute("name")).Count(c => c == '_') == 1).ToList();
+            var formsWithScripts = forms.Where(x => !string.IsNullOrWhiteSpace((string)x.Attribute("script"))).ToList();
+
+            var alarmsWithoutUps = GetAlarmsWithoutScripts(alarms, upsWithScripts);
+            if (alarmsWithoutUps.Count > 0)
+            {
+                foreach (var a in alarmsWithoutUps)
+                    sb.AppendLine($"Alarm {(string)a.Attribute("name")} не входит ни в один UPS");
+                sb.AppendLine();
+            }
+
+            var alarmsWithoutForms = GetAlarmsWithoutScripts(alarms, formsWithScripts);
+            if (alarmsWithoutForms.Count > 0)
+            {
+                foreach (var a in alarmsWithoutForms)
+                    sb.AppendLine($"Alarm {(string)a.Attribute("name")} не входит ни в один Form!");
+                sb.AppendLine();
+            }
+
+            foreach (var u in upsWithScripts)
+                sb.Append(FindNotAlarmScripts(parms, u));
+
+            foreach (var u in formsWithScripts)
+                sb.Append(FindNotAlarmScripts(parms, u));
+
+            return sb.ToString();
+        }
+
+        public static List<XElement> GetAlarmsWithoutScripts(List<XElement> alarms, List<XElement> parmsWithScripts)
+        {
+            var alarmsInScripts = new List<string>();
+            foreach (var parm in parmsWithScripts)
+                alarmsInScripts.AddRange(GetScriptList(parm));
+            return alarms.Where(x => !alarmsInScripts.Contains((string)x.Attribute("name"))).ToList();
+        }
+
+        public static string FindNotAlarmScripts(List<XElement> allParms, XElement element)
+        {
+            var sb = new StringBuilder();
+            var alarmsInScripts = GetScriptList(element);
+            foreach (var a in alarmsInScripts)
+            {
+                var parm = allParms.FirstOrDefault(x => (string)x.Attribute("name") == a);
+                if (parm == null)
+                {
+                    sb.AppendLine($"В скрипте {(string)element.Attribute("name")} используется сигнал {a}, который не объявлен!");
+                    continue;
+                }
+                var parmType = (string)parm.Attribute("type");
+                if (parmType != "alarm" && parmType != "critical_alarm")
+                    sb.AppendLine($"В скрипте {(string)element.Attribute("name")} используется сигнал {a} типа {parmType}");
+            }
+            return sb.ToString();
+        }
+
+        public static List<string> GetScriptList(XElement element)
+        {
+            var alarmsInScripts = new List<string>();
+            alarmsInScripts.AddRange(
+                ((string)element.Attribute("script"))
+                .Replace(" ", string.Empty)
+                .Split('|', StringSplitOptions.RemoveEmptyEntries));
+            return alarmsInScripts;
+        }
+
+        #endregion
     }
 }
