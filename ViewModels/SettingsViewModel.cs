@@ -1,4 +1,5 @@
-﻿using NtiConverter.Functions;
+﻿using Microsoft.Win32;
+using NtiConverter.Functions;
 using NtiConverter.Models;
 using System.ComponentModel;
 using System.IO;
@@ -35,14 +36,41 @@ namespace NtiConverter.ViewModels
                 Settings = SettingsFunctions.LoadObjectFromJson<ReaderSettings>(SettingsFileName);
             }
             SettingsFunctions.ApplyHeaders(Settings);
+            ApplySettingsCmd = new RelayCommand(() => ApplySettings());
             SaveSettingsCmd = new RelayCommand(() => SaveSettings());
+            OpenSettingsCmd = new RelayCommand(() => OpenSettings());
+        }
+
+        public ICommand ApplySettingsCmd { get; }
+        private void ApplySettings()
+        {
+            SettingsFunctions.SaveObjectToJson(SettingsFileName, Settings);
+            SettingsFunctions.ApplyHeaders(Settings);
         }
 
         public ICommand SaveSettingsCmd { get; }
         private void SaveSettings()
         {
-            SettingsFunctions.SaveObjectToJson(SettingsFileName, Settings);
-            SettingsFunctions.ApplyHeaders(Settings);
+            var sfd = new SaveFileDialog()
+            {
+                DefaultExt = "ntirs",
+                Filter = "*.ntirs | *.ntirs"
+            };
+            var res = sfd.ShowDialog();
+            if (!res.HasValue || !res.Value) return;
+            SettingsFunctions.SaveObjectToJson(sfd.FileName, Settings);
+        }        
+
+        public ICommand OpenSettingsCmd { get; }
+        private void OpenSettings()
+        {
+            var ofd = new OpenFileDialog()
+            {
+                Filter = "*.ntirs | *.ntirs"
+            };
+            var res = ofd.ShowDialog();
+            if (!res.HasValue || !res.Value) return;
+            Settings = SettingsFunctions.LoadObjectFromJson<ReaderSettings>(ofd.FileName);
         }
 
         #region PropertyChanged Impllementation

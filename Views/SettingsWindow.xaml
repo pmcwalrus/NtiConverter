@@ -24,6 +24,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <Grid>
@@ -243,8 +244,22 @@
                     </ScrollViewer>
                     <Button Grid.Row="1"
                             Margin="5"
-                            Content="Save"
-                            Command="{Binding SaveSettingsCmd}"/>
+                            Content="Применить"
+                            Command="{Binding ApplySettingsCmd}"/>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                Margin="5"
+                                Content="Открыть файл настроек"                                
+                                Command="{Binding OpenSettingsCmd}"/>
+                        <Button Grid.Column="1"
+                                Margin="5"
+                                Command="{Binding SaveSettingsCmd}"
+                                Content="Сохранить файл настроек"/>
+                    </Grid>
                 </Grid>                    
             </TabItem>
         </TabControl>
