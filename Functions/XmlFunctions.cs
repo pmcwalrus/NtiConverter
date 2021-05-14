@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 
-namespace NtiConverter
+namespace NtiConverter.Functions
 {
     internal static class XmlFunctions
     {
@@ -56,7 +56,7 @@ namespace NtiConverter
                     $"type=\"alarm\" script=\"{device.DeviceName}_con2 &lt; 704\" delay_on=\"5000\" " +
                     $"description=\"Нет связи с {device.Device} по сети 2\"/>");
             }
-            foreach(var device in data.Ip.Where(x => x.DeviceType == DeviceType.Worstation))
+            foreach (var device in data.Ip.Where(x => x.DeviceType == DeviceType.Worstation))
             {
                 sb.AppendLine($"\t\t<parm name=\"{device.DeviceName}_poweroff\" " +
                     $"type=\"bool\" description=\"Выключение станции {device.Device}\"/>");
@@ -123,8 +123,8 @@ namespace NtiConverter
         {
             return "\t\t<parm name=\"kdmp_auto_on\" type=\"int\" description=\"Автовключение КДМП по параметру АПС\"/>\r\n" +
             "\t\t<parm name=\"autokdmp_impulse\" type=\"bool\" script=\"get_alarms_not_ack(kdmp_auto_on) &amp;&amp; SYS_new_alarm\"/>\r\n" +
-		    "\t\t<parm name=\"autokdmp_alarm\" type=\"alarm\" script=\"autokdmp_impulse\" description=\"Сработало автовключение КДМП по АПС механической установки\"/>\r\n" +
-  		    "\t\t<parm name=\"btn_mute\" type=\"bool\"/>\r\n" +                                
+            "\t\t<parm name=\"autokdmp_alarm\" type=\"alarm\" script=\"autokdmp_impulse\" description=\"Сработало автовключение КДМП по АПС механической установки\"/>\r\n" +
+              "\t\t<parm name=\"btn_mute\" type=\"bool\"/>\r\n" +
             "\t\t<parm name=\"mute_sound\" type=\"bool\" script=\"alg.reset_after_timeout('mute', qs_mute_fn(SYS_new_alarm, btn_mute, mute_sound), 30000)\"/>";
         }
 
@@ -181,7 +181,7 @@ namespace NtiConverter
         {
             var window = data.Ups.FirstOrDefault(x => x.AlarmGroup == sk).Window;
             string upsString = string.Empty;
-            foreach(var ups in data.Ups.Where(x => x.AlarmGroup == sk))
+            foreach (var ups in data.Ups.Where(x => x.AlarmGroup == sk))
             {
                 upsString += string.IsNullOrEmpty(upsString)
                         ? $"UPS_{ups.Id} "
@@ -215,9 +215,9 @@ namespace NtiConverter
         public static string GetModbusDevices(NtiBase data)
         {
             var sb = new StringBuilder();
-            var devices = data.Ip.Where(x => (x.DeviceType == DeviceType.Device 
-            || x.DeviceType == DeviceType.ExternalSystem)).ToList();
-            foreach(var device in devices)
+            var devices = data.Ip.Where(x => x.DeviceType == DeviceType.Device
+            || x.DeviceType == DeviceType.ExternalSystem).ToList();
+            foreach (var device in devices)
             {
                 sb.AppendLine($"\t<device name=\"{device.DeviceName}\" " +
                     $"protocol=\"MODBUS-TCP\" address_offset=\"0\" " +
@@ -245,7 +245,7 @@ namespace NtiConverter
         {
             var sb = new StringBuilder();
             var signals = data.Layout.Where(x => x.DeviceIndex == deviceName).ToList();
-            foreach(var signal in signals)
+            foreach (var signal in signals)
             {
                 var param = data.Signals.FirstOrDefault(x => x.Index == signal.SignalName);
                 if (param == null) continue;
@@ -291,10 +291,10 @@ namespace NtiConverter
                 if (signal.Type == "DI" || signal.Type == "DO") type = "DI-DO";
                 else if (signal.Type.Contains("AI")) type = "AI";
                 var shmem = $"nsc-{signal.DeviceIndex}-{type}";
-                if (!shmems.Contains(shmem)) 
+                if (!shmems.Contains(shmem))
                     shmems.Add(shmem);
             }
-            foreach(var signal in data.Signals.Where(x => !string.IsNullOrWhiteSpace(x.Shmem)))
+            foreach (var signal in data.Signals.Where(x => !string.IsNullOrWhiteSpace(x.Shmem)))
             {
                 var shmem = $"{signal.Shmem}";
                 if (!shmems.Contains(shmem))
@@ -309,7 +309,7 @@ namespace NtiConverter
             var parms = data.Signals.Where(x => x.Shmem == shmem);
             foreach (var parm in parms)
             {
-                sb.Append(GetSingleParam(data, parm));                
+                sb.Append(GetSingleParam(data, parm));
             }
             return sb.ToString();
         }

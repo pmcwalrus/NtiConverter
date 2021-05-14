@@ -12,8 +12,7 @@
             <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="Файл" 
-                  Margin="5"
+        <GroupBox Margin="5"
                   Grid.Column="0">
             <Grid>
                 <Grid.RowDefinitions>
@@ -27,7 +26,7 @@
                         Command="{Binding SaveXmlCmd}"/>
                 <Button Grid.Row="1"
                         Margin="5"
-                        Content="Анализ XML"
+                        Content="Анализ alarm'ов"
                         IsEnabled="True"
                         Command="{Binding AnalyzeXmlCmd}"/>
             </Grid>

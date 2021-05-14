@@ -1,9 +1,10 @@
 ﻿<mah:MetroWindow  x:Class="NtiConverter.Views.SettingsWindow"
-                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodels="clr-namespace:NtiConverter.ViewModels"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:viewmodels="clr-namespace:NtiConverter.ViewModels"
                   mc:Ignorable="d"
                   WindowStartupLocation="CenterScreen"
                   ShowMaxRestoreButton="False"
@@ -13,6 +14,239 @@
         <viewmodels:SettingsViewModel/>
     </mah:MetroWindow.DataContext>
     <Grid>
-        
+        <TabControl Grid.Row="0"
+                    Grid.Column="1"
+                    Margin="5"
+                    Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
+            <TabItem Header="Заголовки"
+                     mah:HeaderedControlHelper.HeaderFontSize="22">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Grid.Row="0" 
+                              Header="Перечень"
+                              Margin="5">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="1*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="0"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Наименование параметра"/>
+                                    <TextBox Grid.Row="0"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.DescriptionHeader}"/>
+                                    <TextBlock Grid.Row="1"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Индекс параметра"/>
+                                    <TextBox Grid.Row="1"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.IndexHeader}"/>
+                                    <TextBlock Grid.Row="2"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Единицы измерения"/>
+                                    <TextBox Grid.Row="2"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.UnitsHeader}"/>
+                                    <TextBlock Grid.Row="3"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Тип уставки"/>
+                                    <TextBox Grid.Row="3"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.SetpointsTypeHeader}"/>
+                                    <TextBlock Grid.Row="4"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Значение"/>
+                                    <TextBox Grid.Row="4"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.SetpointValuesHeader}"/>
+                                    <TextBlock Grid.Row="5"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Время задержки,с"/>
+                                    <TextBox Grid.Row="5"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.DelayTimeHeader}"/>
+                                    <TextBlock Grid.Row="6"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Инверсия"/>
+                                    <TextBox Grid.Row="6"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.InversionHeader}"/>
+                                    <TextBlock Grid.Row="7"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="ID системы"/>
+                                    <TextBox Grid.Row="7"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.SystemIdHeader}"/>
+                                    <TextBlock Grid.Row="8"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="ID параметра"/>
+                                    <TextBox Grid.Row="8"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.SignalIdHeader}"/>
+                                    <TextBlock Grid.Row="9"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Type"/>
+                                    <TextBox Grid.Row="9"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.SignalTypeHeader}"/>
+                                    <TextBlock Grid.Row="10"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="ПСТС"/>
+                                    <TextBox Grid.Row="10"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.PstsHeader}"/>
+                                    <TextBlock Grid.Row="11"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="shmem"/>
+                                    <TextBox Grid.Row="11"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.ShmemHeader}"/>
+                                    <TextBlock Grid.Row="12"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="УПС"/>
+                                    <TextBox Grid.Row="12"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.UpsHeader}"/>
+                                    <TextBlock Grid.Row="13"
+                               Grid.Column="0"
+                               Margin="5"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Text="Тип сигнала"/>
+                                    <TextBox Grid.Row="13"
+                             Grid.Column="1"
+                             Margin="5"
+                             VerticalAlignment="Center"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             Text="{Binding Settings.SignalTypeTextHeader}"/>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </ScrollViewer>
+                    <Button Grid.Row="1"
+                            Margin="5"
+                            Content="Save"
+                            Command="{Binding SaveSettingsCmd}"/>
+                </Grid>                    
+            </TabItem>
+        </TabControl>
     </Grid>
 </mah:MetroWindow>

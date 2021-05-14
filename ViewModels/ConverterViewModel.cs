@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Nti.XlsxReader;
 using Nti.XlsxReader.Types;
+using NtiConverter.Functions;
 using NtiConverter.Views;
 using System;
 using System.ComponentModel;
