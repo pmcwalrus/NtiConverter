@@ -39,5 +39,9 @@
                     Content="..."
                     Command="{Binding SelectXmlCmd}"/>
         </Grid>
+        <ListView Grid.Row="1"
+                  Grid.Column="0"
+                  Margin="5"
+                  ItemsSource="{Binding FormControls}"/>
     </Grid>
 </UserControl>

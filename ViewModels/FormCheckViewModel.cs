@@ -2,15 +2,11 @@
 using NtiConverter.Functions;
 using NtiConverter.Models;
 using NtiConverter.Types;
-using System;
-using System.Collections.Generic;
+using NtiConverter.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using Vab.WpfCommands.Commands;
 
@@ -40,6 +36,7 @@ namespace NtiConverter.ViewModels
             {
                 Settings = SettingsFunctions.LoadObjectFromJson<FormCheckSettings>(FormCheckSettings.FormCheckSettingsFileName);
             }
+            FormControls = new ObservableCollection<FormControl>();
             SelectXmlCmd = new RelayCommand(() => SelectXml());
         }
 
@@ -66,6 +63,28 @@ namespace NtiConverter.ViewModels
             Settings.XmlFileName = ofd.FileName;
             XmlForms = new ObservableCollection<FormEntity>(
                 XmlFunctions.GetFormListFromXml(ofd.FileName));
+            foreach (var form in XmlForms)
+            {
+                var control = new FormControl()
+                {
+                    DataContext = new FormViewModel
+                    {
+                        Entity = form,
+                    },
+                };
+                FormControls.Add(control);
+            }
+        }
+
+        private ObservableCollection<FormControl> _formControls;
+        public ObservableCollection<FormControl> FormControls
+        {
+            get => _formControls;
+            set
+            {
+                _formControls = value;
+                OnPropertyChanged();
+            }
         }
 
         #region PropertyChanged Impllementation
