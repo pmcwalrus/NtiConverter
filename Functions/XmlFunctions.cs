@@ -1,5 +1,6 @@
 ﻿using Nti.XlsxReader.Entities;
 using Nti.XlsxReader.Types;
+using NtiConverter.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -386,6 +387,32 @@ namespace NtiConverter.Functions
             return sb.ToString();
         }
 
+        #region FormAnalyze
+
+        public static List<FormEntity> GetFormListFromXml(string fileName)
+        {
+            using var sr = new StreamReader(fileName);
+            var fileData = sr.ReadToEnd();
+            var xmlData = XDocument.Parse(fileData);
+            var parms = xmlData.Descendants("parm").ToList();
+            var forms = parms.Where(x => ((string)x.Attribute("name"))
+                .StartsWith("form_", StringComparison.OrdinalIgnoreCase)
+                && ((string)x.Attribute("name")).Count(c => c == '_') == 1).ToList();
+            var result = new List<FormEntity>();
+            foreach (var form in forms)
+            {
+                var entity = new FormEntity
+                {
+                    Name = (string)form.Attribute("name"),
+                    ScriptParams = GetScriptList(form),
+                };
+                result.Add(entity);
+            }
+            return result;
+        }
+
+        #endregion
+
         #region XML Analyze
 
         public static string AnalyzeXml(string fileName)
@@ -460,9 +487,9 @@ namespace NtiConverter.Functions
         public static List<string> GetScriptList(XElement element)
         {
             var alarmsInScripts = new List<string>();
-            alarmsInScripts.AddRange(
-                ((string)element.Attribute("script"))
-                .Replace(" ", string.Empty)
+            var script = (string)element.Attribute("script");
+            if (string.IsNullOrWhiteSpace(script)) return null;
+            alarmsInScripts.AddRange(script.Replace(" ", string.Empty)
                 .Split('|', StringSplitOptions.RemoveEmptyEntries));
             return alarmsInScripts;
         }

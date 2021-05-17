@@ -48,6 +48,10 @@
                          VerticalScrollBarVisibility="Auto"
                          Text="{Binding XmlAlarmAnalyzeResult}"/>
             </TabItem>
+            <TabItem Header="Анализ форм"
+                     mah:HeaderedControlHelper.HeaderFontSize="22">
+                <local:FormCheckControl/>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>
