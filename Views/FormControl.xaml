@@ -25,6 +25,8 @@
                         Orientation="Horizontal">
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
             </StackPanel>
+            <Button Grid.Column="2"
+                    Command="{Binding Entity.AddFilesToCheckCmd}"/>
         </Grid>
     </GroupBox>
 </UserControl>

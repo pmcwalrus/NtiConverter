@@ -1,5 +1,12 @@
-﻿using System.ComponentModel;
+﻿using NtiConverter.Functions;
+using NtiConverter.Types;
+using NtiConverter.ViewModels;
+using NtiConverter.Views;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows;
 
 namespace NtiConverter.Models
 {
@@ -7,16 +14,31 @@ namespace NtiConverter.Models
     {
         public const string FormCheckSettingsFileName = "forms.ntifcs";
 
+        public FormCheckSettings()
+        {
+        }
+
         private string _xmlFileName;
         public string XmlFileName
         {
             get => _xmlFileName;
             set
             {
+                if (_xmlFileName == value) return;
+                if (!File.Exists(value))
+                {
+                    MessageBox.Show($"Файл {_xmlFileName} не найден!");
+                    _xmlFileName = null;
+                    SettingsFunctions.SaveObjectToJson(FormCheckSettingsFileName, this);
+                    OnPropertyChanged();
+                    return;
+                }
                 _xmlFileName = value;
+                SettingsFunctions.SaveObjectToJson(FormCheckSettingsFileName, this);
                 OnPropertyChanged();
             }
         }
+
 
 
         #region PropertyChanged Impllementation

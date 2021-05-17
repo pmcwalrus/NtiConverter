@@ -37,33 +37,16 @@ namespace NtiConverter.ViewModels
                 Settings = SettingsFunctions.LoadObjectFromJson<FormCheckSettings>(FormCheckSettings.FormCheckSettingsFileName);
             }
             FormControls = new ObservableCollection<FormControl>();
+            Settings.PropertyChanged += SettingsPropertyChanged;
             SelectXmlCmd = new RelayCommand(() => SelectXml());
         }
 
-        private ObservableCollection<FormEntity> _xmlForms;
-        public ObservableCollection<FormEntity> XmlForms
+        private void SettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            get => _xmlForms;
-            set
-            {
-                _xmlForms = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand SelectXmlCmd { get; }
-        private void SelectXml()
-        {
-            var ofd = new OpenFileDialog
-            {
-                Filter = "XML | *.xml"
-            };
-            var dRes = ofd.ShowDialog();
-            if (!dRes.HasValue || !dRes.Value) return;
-            Settings.XmlFileName = ofd.FileName;
-            XmlForms = new ObservableCollection<FormEntity>(
-                XmlFunctions.GetFormListFromXml(ofd.FileName));
-            foreach (var form in XmlForms)
+            if (e.PropertyName != "XmlFileName") return;
+            var xmlForms = new ObservableCollection<FormEntity>(
+                XmlFunctions.GetFormListFromXml(Settings.XmlFileName));
+            foreach (var form in xmlForms)
             {
                 var control = new FormControl()
                 {
@@ -86,6 +69,19 @@ namespace NtiConverter.ViewModels
                 OnPropertyChanged();
             }
         }
+
+        public ICommand SelectXmlCmd { get; }
+        private void SelectXml()
+        {
+            var ofd = new OpenFileDialog
+            {
+                Filter = "XML | *.xml"
+            };
+            var dRes = ofd.ShowDialog();
+            if (!dRes.HasValue || !dRes.Value) return;
+            Settings.XmlFileName = Path.GetRelativePath(Directory.GetCurrentDirectory(), ofd.FileName);            
+        }
+
 
         #region PropertyChanged Impllementation
 
