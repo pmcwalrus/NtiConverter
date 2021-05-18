@@ -79,7 +79,7 @@ namespace NtiConverter.Models
                 OnPropertyChanged();
             }
         }
-        private string _systemIdHeader = "System ID";
+        private string _systemIdHeader = "Parm system ID";
         public string SystemIdHeader
         {
             get => _systemIdHeader;
@@ -89,7 +89,7 @@ namespace NtiConverter.Models
                 OnPropertyChanged();
             }
         }
-        private string _signalIdHeader = "Signal ID (new)";
+        private string _signalIdHeader = "Parm ID";
         public string SignalIdHeader
         {
             get => _signalIdHeader;
