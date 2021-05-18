@@ -29,7 +29,7 @@
             </StackPanel>
             <TextBox Grid.Column="2"
                      Margin="5"
-                     IsReadOnly="True"
+                     IsReadOnly="True"                     
                      Text="{Binding CheckFilesString}"
                      VerticalAlignment="Center"/>
             <Button Grid.Column="3"

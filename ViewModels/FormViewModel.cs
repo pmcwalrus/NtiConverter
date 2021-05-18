@@ -21,6 +21,10 @@ namespace NtiConverter.ViewModels
                 _entity = value;
                 value.PropertyChanged += EntityPropertyChanged;
                 value.FilesToCheck.CollectionChanged += FilesToCheckCollectionChanged;
+                var str = string.Empty;
+                foreach (var file in value.FilesToCheck)
+                    str += $"{file};";
+                CheckFilesString = str;
                 OnPropertyChanged();
             }
         }

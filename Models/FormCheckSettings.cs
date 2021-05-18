@@ -2,6 +2,7 @@
 using NtiConverter.Types;
 using NtiConverter.ViewModels;
 using NtiConverter.Views;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -35,6 +36,17 @@ namespace NtiConverter.Models
                 //}
                 _xmlFileName = value;
                 SettingsFunctions.SaveObjectToJson(FormCheckSettingsFileName, this);
+                OnPropertyChanged();
+            }
+        }
+
+        private List<(string, List<string>)> _filesToCheckList = new();
+        public List<(string ParamName, List<string> FilesToCheck)> FilesToCheckList
+        {
+            get => _filesToCheckList;
+            set
+            {
+                _filesToCheckList = value;
                 OnPropertyChanged();
             }
         }

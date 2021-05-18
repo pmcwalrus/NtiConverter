@@ -42,6 +42,7 @@
         <ListView Grid.Row="1"
                   Grid.Column="0"
                   Margin="5"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   ItemsSource="{Binding FormControls}"/>
     </Grid>
 </UserControl>

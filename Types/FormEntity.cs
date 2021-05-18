@@ -1,8 +1,12 @@
 ﻿using Microsoft.Win32;
+using NtiConverter.Functions;
+using NtiConverter.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Vab.WpfCommands.Commands;
@@ -11,6 +15,7 @@ namespace NtiConverter.Types
 {
     internal class FormEntity : INotifyPropertyChanged
     {
+        public FormCheckSettings Settings { get; set; }
         public FormEntity()
         {
             FilesToCheck = new ObservableCollection<string>();
@@ -47,8 +52,46 @@ namespace NtiConverter.Types
             set
             {
                 _filesToCheck = value;
+                value.CollectionChanged += FilesToCheckCollectionChanged;
+                SaveFilesToCheck();
                 OnPropertyChanged();
             }
+        }
+
+        private void FilesToCheckCollectionChanged(object sender,NotifyCollectionChangedEventArgs e)
+        {
+            SaveFilesToCheck();
+        }
+
+        private void SaveFilesToCheck()
+        {
+            if (Settings == null) return;
+            var savedParam = Settings.FilesToCheckList.FirstOrDefault(x => x.ParamName == Name);
+            if (savedParam.ParamName == null)
+            {
+                Settings.FilesToCheckList.Add((Name, FilesToCheck.ToList()));
+            }
+            else
+            {
+                if (savedParam.FilesToCheck == null)
+                    savedParam.FilesToCheck = new List<string>();
+                foreach(var file in FilesToCheck)
+                {
+                    if (savedParam.FilesToCheck.Contains(file))
+                        continue;
+                    savedParam.FilesToCheck.Add(file);                    
+                }
+                var listToDelete = new List<string>();
+                foreach (var file in savedParam.FilesToCheck)
+                {
+                    if (!FilesToCheck.Contains(file))
+                        listToDelete.Add(file);
+                        
+                }
+                foreach (var d in listToDelete)
+                    savedParam.FilesToCheck.Remove(d);
+            }
+            SettingsFunctions.SaveObjectToJson(FormCheckSettings.FormCheckSettingsFileName, Settings);
         }
 
         public ICommand AddFilesToCheckCmd { get; }

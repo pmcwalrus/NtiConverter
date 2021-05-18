@@ -6,6 +6,7 @@ using NtiConverter.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Vab.WpfCommands.Commands;
@@ -56,6 +57,12 @@ namespace NtiConverter.ViewModels
             if (formList == null) return;
             foreach (var form in formList)
             {
+                form.Settings = Settings;
+                var savedFiles = Settings.FilesToCheckList.FirstOrDefault(x => x.ParamName == form.Name);
+                if (savedFiles.FilesToCheck != null)
+                {
+                    form.FilesToCheck = new ObservableCollection<string>(savedFiles.FilesToCheck);
+                }
                 var control = new FormControl()
                 {
                     DataContext = new FormViewModel
