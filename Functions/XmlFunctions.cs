@@ -107,6 +107,7 @@ namespace NtiConverter.Functions
                 sb.AppendLine($"\t\t<parm name=\"UPS_{ups.Id}_cmd\" type=\"int\" " +
                     $"script=\"set_OAPS(UPS_{ups.Id}_alarm, UPS_{ups.Id}_ack)\"/>");
             }
+            sb.AppendLine(GetVk(data));
             sb.AppendLine(GetStaticDataPusOaps());
             var skScript = string.Empty;
             foreach (var sk in skList)
@@ -177,6 +178,55 @@ namespace NtiConverter.Functions
                 ? string.Empty
                 : $"script=\"{parmsString}\"";
             return $"\t\t<parm name=\"UPS_{ups.Id}\" type=\"int\" {script} description=\"{ups.Group}\"/>";
+        }
+
+        public static string GetVk(NtiBase data)
+        {
+            var sb = new StringBuilder();
+            foreach (var vk in data.Vk)
+            {
+                if (string.IsNullOrWhiteSpace(vk.Name)) continue;
+                var parms = data.Signals.Where(x => x.Vk == vk.Number);
+                var parmsString = string.Empty;
+                foreach (var parm in parms)
+                {
+                    if (parm.Type == SignalTypes.Alarm || parm.Type == SignalTypes.CritcalAlarm)
+                        parmsString += string.IsNullOrEmpty(parmsString)
+                            ? $"{parm.SystemId}_{parm.SignalId} "
+                            : $"| {parm.SystemId}_{parm.SignalId} ";
+                    if (parm.SetpointTypes != null)
+                    {
+                        foreach (var sp in parm.SetpointTypes)
+                        {
+                            string suffix;
+                            switch (sp)
+                            {
+                                case SetpointTypes.LL:
+                                    suffix = "LL";
+                                    break;
+                                case SetpointTypes.L:
+                                    suffix = "L";
+                                    break;
+                                case SetpointTypes.H:
+                                    suffix = "H";
+                                    break;
+                                case SetpointTypes.HH:
+                                    suffix = "HH";
+                                    break;
+                                default:
+                                    suffix = "???";
+                                    break;
+                            }
+                            parmsString += string.IsNullOrEmpty(parmsString)
+                                ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
+                                : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
+                        }
+                    }
+                }
+                var script = string.IsNullOrEmpty(parmsString) ? string.Empty : $" script=\"{parmsString}\"";
+                sb.AppendLine($"\t\t<parm name=\"{vk.Name}\" type=\"int\" description=\"{vk.Description}\"{script}/>");
+            }
+            return sb.ToString();
         }
 
         public static string GetSk(NtiBase data, string sk)
