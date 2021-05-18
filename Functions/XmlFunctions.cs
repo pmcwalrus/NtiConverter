@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Xml.Linq;
 
 namespace NtiConverter.Functions
@@ -391,6 +392,12 @@ namespace NtiConverter.Functions
 
         public static List<FormEntity> GetFormListFromXml(string fileName)
         {
+            if (fileName == null) return null;
+            if (!File.Exists(fileName))
+            {
+                MessageBox.Show($"Файл {fileName} не найден!");
+                return null;
+            }
             using var sr = new StreamReader(fileName);
             var fileData = sr.ReadToEnd();
             var xmlData = XDocument.Parse(fileData);

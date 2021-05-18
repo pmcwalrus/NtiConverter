@@ -27,6 +27,8 @@ namespace NtiConverter.ViewModels
 
         public FormCheckViewModel()
         {
+            FormControls = new ObservableCollection<FormControl>();
+            SelectXmlCmd = new RelayCommand(() => SelectXml());
             if (!File.Exists(FormCheckSettings.FormCheckSettingsFileName))
             {
                 Settings = new FormCheckSettings();
@@ -35,18 +37,24 @@ namespace NtiConverter.ViewModels
             else
             {
                 Settings = SettingsFunctions.LoadObjectFromJson<FormCheckSettings>(FormCheckSettings.FormCheckSettingsFileName);
-            }
-            FormControls = new ObservableCollection<FormControl>();
+                if (!string.IsNullOrWhiteSpace(Settings.XmlFileName))
+                    ReadFormsFromXml();
+            }            
             Settings.PropertyChanged += SettingsPropertyChanged;
-            SelectXmlCmd = new RelayCommand(() => SelectXml());
         }
 
         private void SettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName != "XmlFileName") return;
-            var xmlForms = new ObservableCollection<FormEntity>(
-                XmlFunctions.GetFormListFromXml(Settings.XmlFileName));
-            foreach (var form in xmlForms)
+            ReadFormsFromXml();
+        }
+
+        private void ReadFormsFromXml()
+        {
+            FormControls = new ObservableCollection<FormControl>();
+            var formList = XmlFunctions.GetFormListFromXml(Settings.XmlFileName);
+            if (formList == null) return;
+            foreach (var form in formList)
             {
                 var control = new FormControl()
                 {

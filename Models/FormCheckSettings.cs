@@ -25,14 +25,14 @@ namespace NtiConverter.Models
             set
             {
                 if (_xmlFileName == value) return;
-                if (!File.Exists(value))
-                {
-                    MessageBox.Show($"Файл {_xmlFileName} не найден!");
-                    _xmlFileName = null;
-                    SettingsFunctions.SaveObjectToJson(FormCheckSettingsFileName, this);
-                    OnPropertyChanged();
-                    return;
-                }
+                //if (!File.Exists(value))
+                //{
+                //    MessageBox.Show($"Файл {value} не найден!");
+                //    _xmlFileName = null;
+                //    SettingsFunctions.SaveObjectToJson(FormCheckSettingsFileName, this);
+                //    OnPropertyChanged();
+                //    return;
+                //}
                 _xmlFileName = value;
                 SettingsFunctions.SaveObjectToJson(FormCheckSettingsFileName, this);
                 OnPropertyChanged();

@@ -15,6 +15,7 @@ namespace NtiConverter.Types
         {
             FilesToCheck = new ObservableCollection<string>();
             AddFilesToCheckCmd = new RelayCommand(() => AddFilesToCheck());
+            ClearFilesCmd = new RelayCommand(() => ClearFiles());
         }
 
         private string _name;
@@ -56,7 +57,7 @@ namespace NtiConverter.Types
             var ofd = new OpenFileDialog
             {
                 Multiselect = true,
-              //  Filter = "*.ui | *.ui",
+                Filter = "*.ui | *.ui",
             };
             var res = ofd.ShowDialog();
             if (!res.HasValue || !res.Value) return;
@@ -64,6 +65,12 @@ namespace NtiConverter.Types
             {
                 FilesToCheck.Add(Path.GetRelativePath(Directory.GetCurrentDirectory(), file));
             }
+        }
+
+        public ICommand ClearFilesCmd { get; }
+        private void ClearFiles()
+        {
+            FilesToCheck = new ObservableCollection<string>();
         }
 
         #region PropertyChanged Impllementation
