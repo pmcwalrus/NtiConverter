@@ -13,6 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -44,5 +45,12 @@
                   Margin="5"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   ItemsSource="{Binding FormControls}"/>
+        <Button Grid.Row="2"
+                Grid.Column="0"
+                Margin="5"
+                Content="Проверить формы"
+                VerticalAlignment="Center"
+                IsEnabled="{Binding IsCheckEnabled}"
+                Command="{Binding CheckFormsCmd}"/>
     </Grid>
 </UserControl>

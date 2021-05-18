@@ -3,11 +3,15 @@ using NtiConverter.Functions;
 using NtiConverter.Models;
 using NtiConverter.Types;
 using NtiConverter.Views;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
 using Vab.WpfCommands.Commands;
 
@@ -30,6 +34,7 @@ namespace NtiConverter.ViewModels
         {
             FormControls = new ObservableCollection<FormControl>();
             SelectXmlCmd = new RelayCommand(() => SelectXml());
+            CheckFormsCmd = new RelayCommand(() => CheckForms());
             if (!File.Exists(FormCheckSettings.FormCheckSettingsFileName))
             {
                 Settings = new FormCheckSettings();
@@ -81,6 +86,24 @@ namespace NtiConverter.ViewModels
             set
             {
                 _formControls = value;
+                IsCheckEnabled = value != null && value.Count > 0;
+                value.CollectionChanged += FormControlsCollectionChanged;
+                OnPropertyChanged();
+            }
+        }
+
+        private void FormControlsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            IsCheckEnabled = FormControls.Count > 0;
+        }
+
+        private bool _isCheckEnabled;
+        public bool IsCheckEnabled
+        {
+            get => _isCheckEnabled;
+            set
+            {
+                _isCheckEnabled = value;
                 OnPropertyChanged();
             }
         }
@@ -97,6 +120,36 @@ namespace NtiConverter.ViewModels
             Settings.XmlFileName = Path.GetRelativePath(Directory.GetCurrentDirectory(), ofd.FileName);            
         }
 
+        public ICommand CheckFormsCmd { get; }
+        private void CheckForms()
+        {
+            try
+            {
+                var entities = new List<FormEntity>();
+                foreach (var formControl in FormControls)
+                {
+                    if (formControl.DataContext is not FormViewModel vm) return;
+                    entities.Add(vm.Entity);
+                }
+                var result = FormFunctions.CheckForms(entities);
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    MessageBox.Show($"Все файлы прошли проверку.",
+                        "Успешно!", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    var win = new MessageTextWindow();
+                    win.Tb.Text = result;
+                    win.ShowDialog();
+                }
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}",
+                    "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         #region PropertyChanged Impllementation
 
