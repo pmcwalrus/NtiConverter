@@ -18,6 +18,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0"
                         Margin="5"
@@ -25,6 +27,16 @@
                         IsEnabled="{Binding Reader.BaseParsed}"
                         Command="{Binding SaveXmlCmd}"/>
                 <Button Grid.Row="1"
+                        Margin="5"
+                        IsEnabled="{Binding Reader.BaseParsed}"
+                        Command="{Binding CheckSignalListCmd}"
+                        Content="Проверить перечень"/>
+                <Button Grid.Row="2"
+                        Margin="5"
+                        Content="Проверить раскладку"
+                        IsEnabled="{Binding Reader.BaseParsed}"
+                        Command="{Binding CheckLayoutCmd}"/>
+                <Button Grid.Row="3"
                         Margin="5"
                         Content="Анализ alarm'ов"
                         IsEnabled="True"

@@ -6,6 +6,7 @@ using NtiConverter.Views;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using Vab.WpfCommands.Commands;
@@ -24,6 +25,8 @@ namespace NtiConverter.ViewModels
             SaveXmlCmd = new RelayCommand(() => SaveXml());
             ShowSettingsWindowCmd = new RelayCommand(() => ShowSettingsWindow());
             AnalyzeXmlCmd = new RelayCommand(() => AnalyzeXml());
+            CheckLayoutCmd = new RelayCommand(() => CheckLayout());
+            CheckSignalListCmd = new RelayCommand(() => CheckSignalList());
         }
 
         #region Select XLSX
@@ -119,6 +122,48 @@ namespace NtiConverter.ViewModels
                 MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}", 
                     "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        public ICommand CheckLayoutCmd { get; }
+        private void CheckLayout()
+        {
+            var signals = XlsxFunctions.CheckLayout(DataBase);
+            if (signals == null || signals.Count == 0)
+            {
+                MessageBox.Show($"Все сигналы перечня есть в раскладке.",
+                    "GOOD JOB!", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var sb = new StringBuilder();
+            sb.AppendLine("Индексы сигналов в перечне, которых нет в раскладке:");
+            foreach (var s in  signals)
+            {
+                sb.AppendLine(s.Index);
+            }
+            var win = new MessageTextWindow();
+            win.Tb.Text = sb.ToString();
+            win.ShowDialog();
+        }
+
+        public ICommand CheckSignalListCmd { get; }
+        private void CheckSignalList()
+        {
+            var signals = XlsxFunctions.CheckSignalList(DataBase);
+            if (signals == null || signals.Count == 0)
+            {
+                MessageBox.Show($"Все сигналы раскладки есть в перечне.",
+                    "GOOD JOB!", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            var sb = new StringBuilder();
+            sb.AppendLine("Индексы сигналов в раскладке, которых нет в перечне:");
+            foreach (var s in signals)
+            {
+                sb.AppendLine(s.SignalName);
+            }
+            var win = new MessageTextWindow();
+            win.Tb.Text = sb.ToString();
+            win.ShowDialog();
         }
 
         #region PropertyChanged Impllementation
