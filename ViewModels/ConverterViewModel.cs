@@ -82,7 +82,9 @@ namespace NtiConverter.ViewModels
             {
                 MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}",
                     "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+            MessageBox.Show($"Успешно!", "OK", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         #endregion

@@ -135,6 +135,10 @@ namespace NtiConverter.Functions
         {
             var parmsString = string.Empty;
             var parms = data.Signals.Where(x => x.Ups == ups.Id);
+            var parmsCritical = data.Signals.Where(x => !string.IsNullOrWhiteSpace(x.Ups) 
+            && ((int.Parse(x.Ups) + 22).ToString() == ups.Id) 
+            && x.SetpointTypes != null
+            && (x.SetpointTypes.Contains(SetpointTypes.HH) || x.SetpointTypes.Contains(SetpointTypes.LL)));
             foreach (var parm in parms)
             {
                 if (parm.Type == SignalTypes.Alarm || parm.Type == SignalTypes.CritcalAlarm)
@@ -153,8 +157,7 @@ namespace NtiConverter.Functions
                         switch (sp)
                         {
                             case SetpointTypes.LL:
-                                suffix = "LL";
-                                break;
+                                continue;
                             case SetpointTypes.L:
                                 suffix = "L";
                                 break;
@@ -162,11 +165,38 @@ namespace NtiConverter.Functions
                                 suffix = "H";
                                 break;
                             case SetpointTypes.HH:
-                                suffix = "HH";
-                                break;
+                                continue;
                             default:
                                 suffix = "???";
                                 break;
+                        }
+                        parmsString += string.IsNullOrEmpty(parmsString)
+                            ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
+                            : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
+                    }
+                }
+            }
+            foreach (var parm in parmsCritical)
+            {
+                if (parm.SetpointTypes != null)
+                {
+                    foreach (var sp in parm.SetpointTypes)
+                    {
+                        string suffix;
+                        switch (sp)
+                        {
+                            case SetpointTypes.LL:
+                                suffix = "LL";
+                                break;
+                            case SetpointTypes.L:
+                                continue;
+                            case SetpointTypes.H:
+                                continue;
+                            case SetpointTypes.HH:
+                                suffix = "HH";
+                                break;
+                            default:
+                                continue;
                         }
                         parmsString += string.IsNullOrEmpty(parmsString)
                             ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
@@ -375,6 +405,9 @@ namespace NtiConverter.Functions
             var alarmGroup = !string.IsNullOrWhiteSpace(param.Ups)
                 ? $"alarm_group=\"{data.Ups.FirstOrDefault(x => x.Id == param.Ups).AlarmGroup}\" "
                 : string.Empty;
+            var criticalAlarmGroup = !string.IsNullOrWhiteSpace(param.Ups)
+                ? $"alarm_group=\"{data.Ups.FirstOrDefault(x => x.Id == (int.Parse(param.Ups) + 22).ToString()).AlarmGroup}\" "
+                : string.Empty;
             var paramName = $"{param.SystemId}_{param.SignalId}";
             sb.AppendLine($"\t\t<parm name=\"{paramName}\" " +
                 $"type=\"{param.TypeString}\" {inverted} {alarmGroup}" +
@@ -400,37 +433,43 @@ namespace NtiConverter.Functions
                 var descriptionLevel = string.Empty;
                 for (var i = 0; i < param.SetpointTypes.Count; i++)
                 {
+                    var alarm = string.Empty;
                     switch (param.SetpointTypes[i])
                     {
                         case SetpointTypes.LL:
                             suffix = "LL";
                             type = "critical_alarm";
                             descriptionLevel = "АНУ";
+                            alarm = criticalAlarmGroup;
                             break;
                         case SetpointTypes.L:
                             suffix = "L";
                             type = "alarm";
                             descriptionLevel = "НУ";
+                            alarm = alarmGroup;
                             break;
                         case SetpointTypes.H:
                             suffix = "H";
                             type = "alarm";
                             descriptionLevel = "ВУ";
+                            alarm = alarmGroup;
                             break;
                         case SetpointTypes.HH:
                             suffix = "HH";
                             type = "critical_alarm";
                             descriptionLevel = "АВУ";
+                            alarm = criticalAlarmGroup;
                             break;
                         case SetpointTypes.Unkown:
                             suffix = "???";
                             type = "???";
                             descriptionLevel = "???";
+                            alarm = "???";
                             break;
                     }
                     var setpointString = $"\t\t<parm name=\"{paramName}_{suffix}\" " +
                         $"type=\"{type}\" delay_on=\"{param.DelayTimeString}\" " +
-                        $"script=\"{paramName}_u &lt;={param.SetpointValues[i]}\" {alarmGroup}" +
+                        $"script=\"{paramName}_u &lt;={param.SetpointValues[i]}\" {alarm}" +
                         $"description=\"{param.Description} {descriptionLevel}\"/>";
                     sb.AppendLine(setpointString);
                 }
