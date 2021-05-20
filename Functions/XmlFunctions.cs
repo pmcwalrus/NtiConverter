@@ -367,15 +367,15 @@ namespace NtiConverter.Functions
         public static List<string> GetShmemList(NtiBase data)
         {
             var shmems = new List<string>();
-            foreach (var signal in data.Layout)
-            {
-                var type = "???";
-                if (signal.Type == "DI" || signal.Type == "DO") type = "DI-DO";
-                else if (signal.Type.Contains("AI")) type = "AI";
-                var shmem = $"nsc-{signal.DeviceIndex}-{type}";
-                if (!shmems.Contains(shmem))
-                    shmems.Add(shmem);
-            }
+            //foreach (var signal in data.Layout)
+            //{
+            //    var type = "???";
+            //    if (signal.Type == "DI" || signal.Type == "DO") type = "DI-DO";
+            //    else if (signal.Type.Contains("AI")) type = "AI";
+            //    var shmem = $"nsc-{signal.DeviceIndex}-{type}";
+            //    if (!shmems.Contains(shmem))
+            //        shmems.Add(shmem);
+            //}
             foreach (var signal in data.Signals.Where(x => !string.IsNullOrWhiteSpace(x.Shmem)))
             {
                 var shmem = $"{signal.Shmem}";
@@ -408,28 +408,46 @@ namespace NtiConverter.Functions
             var criticalAlarmGroup = !string.IsNullOrWhiteSpace(param.Ups)
                 ? $"alarm_group=\"{data.Ups.FirstOrDefault(x => x.Id == (int.Parse(param.Ups) + 22).ToString()).AlarmGroup}\" "
                 : string.Empty;
+            var updateTreshold = !string.IsNullOrWhiteSpace(param.UpdateTreshold) && !param.Is420mA
+                ? $"update_threshold=\"{param.UpdateTreshold}\" "
+                : string.Empty;
             var paramName = $"{param.SystemId}_{param.SignalId}";
+            var memchange = param.Is420mA ? "mem_change=\"false\" " : string.Empty;
+            var script = !string.IsNullOrWhiteSpace(param.Script)
+                ? $"script=\"{param.Script}\" "
+                : string.Empty;
+
             sb.AppendLine($"\t\t<parm name=\"{paramName}\" " +
-                $"type=\"{param.TypeString}\" {inverted} {alarmGroup}" +
+                $"type=\"{param.TypeString}\" {updateTreshold}{inverted}{memchange}{alarmGroup}{script}" +
                 $"description=\"{param.Description}\"/>");
+
+
             if (param.Is420mA)
             {
                 var f0String = $"\t\t<parm name=\"{paramName}_f0\" " +
                     $"type=\"alarm\" delay_on=\"3\" script=\"({paramName} &lt; -1250) || ({paramName} &gt; 11250)\"  " +
-                    $"{alarmGroup}description=\"Отказ датчика {param.Description}\"/>";
+                    $"{alarmGroup}description=\"{param.Description} Отказ датчика\"/>";
                 sb.AppendLine(f0String);
             }
             if (!string.IsNullOrWhiteSpace(param.Units))
             {
+                var updateTreshold420 = string.Empty;
+                if (param.Is420mA)
+                {
+                    updateTreshold420 = !string.IsNullOrWhiteSpace(param.UpdateTreshold)
+                        ? $"update_threshold=\"{param.UpdateTreshold}\" "
+                        : $"update_threshold=\"0.1\" ";
+                }
                 var unitsString = $"\t\t<parm name=\"{paramName}_u\" type=\"{param.TypeString}\" " +
-                    $"script=\"alg.interpolation({paramName}, x1_f8017c1, y1_{paramName})\" " +
-                    $"update_threshold=\"0.1\" description=\"{param.Description} в {param.Units}\"/>";
+                    $"script=\"alg.interpolation({paramName}, x1_{paramName}, y1_{paramName})\" " +
+                    $"{updateTreshold420}description=\"{param.Description} в {param.Units}\"/>";
                 sb.AppendLine(unitsString);
             }
             if (!string.IsNullOrWhiteSpace(param.SetpointTypesString))
             {
                 var suffix = string.Empty;
                 var type = string.Empty;
+                var atr = string.Empty;
                 var descriptionLevel = string.Empty;
                 for (var i = 0; i < param.SetpointTypes.Count; i++)
                 {
@@ -441,35 +459,40 @@ namespace NtiConverter.Functions
                             type = "critical_alarm";
                             descriptionLevel = "АНУ";
                             alarm = criticalAlarmGroup;
+                            atr = "&lt;";
                             break;
                         case SetpointTypes.L:
                             suffix = "L";
                             type = "alarm";
                             descriptionLevel = "НУ";
                             alarm = alarmGroup;
+                            atr = "&lt;";
                             break;
                         case SetpointTypes.H:
                             suffix = "H";
                             type = "alarm";
                             descriptionLevel = "ВУ";
                             alarm = alarmGroup;
+                            atr = "&gt;";
                             break;
                         case SetpointTypes.HH:
                             suffix = "HH";
                             type = "critical_alarm";
                             descriptionLevel = "АВУ";
                             alarm = criticalAlarmGroup;
+                            atr = "&gt;";
                             break;
                         case SetpointTypes.Unkown:
                             suffix = "???";
                             type = "???";
                             descriptionLevel = "???";
                             alarm = "???";
+                            atr = "???";
                             break;
                     }
                     var setpointString = $"\t\t<parm name=\"{paramName}_{suffix}\" " +
                         $"type=\"{type}\" delay_on=\"{param.DelayTimeString}\" " +
-                        $"script=\"{paramName}_u &lt;={param.SetpointValues[i]}\" {alarm}" +
+                        $"script=\"{paramName}_u {atr}={param.SetpointValues[i]}\" {alarm}" +
                         $"description=\"{param.Description} {descriptionLevel}\"/>";
                     sb.AppendLine(setpointString);
                 }
