@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\TestSolution\Vab.WpfCommands\Vab.WpfCommands\Vab.WpfCommands.csproj" />
     <ProjectReference Include="..\Nti.XlsxReader\Nti.XlsxReader.csproj" />
+    <ProjectReference Include="..\Vab.WpfCommands\Vab.WpfCommands.csproj" />
   </ItemGroup>
 
 </Project>

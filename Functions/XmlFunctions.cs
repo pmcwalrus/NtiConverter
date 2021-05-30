@@ -252,6 +252,12 @@ namespace NtiConverter.Functions
                                 : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
                         }
                     }
+                    if (parm.Is420mA)
+                    {
+                        parmsString += string.IsNullOrEmpty(parmsString)
+                                ? $"{parm.SystemId}_{parm.SignalId}_f0 "
+                                : $"| {parm.SystemId}_{parm.SignalId}_f0 ";
+                    }
                 }
                 var script = string.IsNullOrEmpty(parmsString) ? string.Empty : $" script=\"{parmsString}\"";
                 sb.AppendLine($"\t\t<parm name=\"{vk.Name}\" type=\"int\" description=\"{vk.Description}\"{script}/>");
@@ -408,28 +414,38 @@ namespace NtiConverter.Functions
             var criticalAlarmGroup = !string.IsNullOrWhiteSpace(param.Ups)
                 ? $"alarm_group=\"{data.Ups.FirstOrDefault(x => x.Id == (int.Parse(param.Ups) + 22).ToString()).AlarmGroup}\" "
                 : string.Empty;
-            var updateTreshold = !string.IsNullOrWhiteSpace(param.UpdateTreshold) && !param.Is420mA
+            var updateTreshold = !string.IsNullOrWhiteSpace(param.UpdateTreshold)
+                && !param.UpdateTreshold.ToLower().Contains("no")
+                && !param.Is420mA
                 ? $"update_threshold=\"{param.UpdateTreshold}\" "
                 : string.Empty;
             var paramName = $"{param.SystemId}_{param.SignalId}";
-            var memchange = param.Is420mA ? "mem_change=\"false\" " : string.Empty;
+            var memchange = param.Is420mA 
+                || param.UpdateTreshold.ToLower().Contains("no") 
+                ? "mem_change=\"false\" " 
+                : string.Empty;
             var script = !string.IsNullOrWhiteSpace(param.Script)
                 ? $"script=\"{param.Script}\" "
                 : string.Empty;
 
+            var alarmString = param.Type == SignalTypes.Alarm 
+                || param.Type == SignalTypes.CritcalAlarm
+                ? alarmGroup
+                : string.Empty;
+
             sb.AppendLine($"\t\t<parm name=\"{paramName}\" " +
-                $"type=\"{param.TypeString}\" {updateTreshold}{inverted}{memchange}{alarmGroup}{script}" +
+                $"type=\"{param.TypeString}\" {updateTreshold}{inverted}{memchange}{alarmString}{script}" +
                 $"description=\"{param.Description}\"/>");
 
 
             if (param.Is420mA)
             {
                 var f0String = $"\t\t<parm name=\"{paramName}_f0\" " +
-                    $"type=\"alarm\" delay_on=\"3\" script=\"({paramName} &lt; -1250) || ({paramName} &gt; 11250)\"  " +
+                    $"type=\"alarm\" script=\"({paramName} &lt; -1250) || ({paramName} &gt; 11250)\"  " +
                     $"{alarmGroup}description=\"{param.Description} Отказ датчика\"/>";
                 sb.AppendLine(f0String);
             }
-            if (!string.IsNullOrWhiteSpace(param.Units))
+            if (!string.IsNullOrWhiteSpace(param.Units) && param.Is420mA) // В последних правках _u нужно создавать только для 4-20 сигналов
             {
                 var updateTreshold420 = string.Empty;
                 if (param.Is420mA)
@@ -490,8 +506,17 @@ namespace NtiConverter.Functions
                             atr = "???";
                             break;
                     }
+                    var delayOn = string.Empty;
+                    if (!string.IsNullOrEmpty(param.DelayTimeString))
+                    {
+                        var dTimeParseRes = Double.TryParse(param.DelayTimeString, out var delayTimeDouble);
+                        if (!dTimeParseRes)
+                            throw new AggregateException($"Can't parse delay time (Value: {param.DelayTimeString}) for parameter {param.Description}");
+                        var dTimeMs = (int)(delayTimeDouble * 1000);
+                        delayOn = $"delay_on=\"{dTimeMs}\" ";
+                    }
                     var setpointString = $"\t\t<parm name=\"{paramName}_{suffix}\" " +
-                        $"type=\"{type}\" delay_on=\"{param.DelayTimeString}\" " +
+                        $"type=\"{type}\" {delayOn}" +
                         $"script=\"{paramName}_u {atr}={param.SetpointValues[i]}\" {alarm}" +
                         $"description=\"{param.Description} {descriptionLevel}\"/>";
                     sb.AppendLine(setpointString);
