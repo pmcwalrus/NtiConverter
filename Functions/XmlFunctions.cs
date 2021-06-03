@@ -411,9 +411,6 @@ namespace NtiConverter.Functions
             var alarmGroup = !string.IsNullOrWhiteSpace(param.Ups)
                 ? $"alarm_group=\"{data.Ups.FirstOrDefault(x => x.Id == param.Ups).AlarmGroup}\" "
                 : string.Empty;
-            var criticalAlarmGroup = !string.IsNullOrWhiteSpace(param.Ups)
-                ? $"alarm_group=\"{data.Ups.FirstOrDefault(x => x.Id == (int.Parse(param.Ups) + 22).ToString()).AlarmGroup}\" "
-                : string.Empty;
             var updateTreshold = !string.IsNullOrWhiteSpace(param.UpdateTreshold)
                 && !param.UpdateTreshold.ToLower().Contains("no")
                 && !param.Is420mA
@@ -461,6 +458,18 @@ namespace NtiConverter.Functions
             }
             if (!string.IsNullOrWhiteSpace(param.SetpointTypesString))
             {
+                UpsEntity critical_ups = null; ;
+                if (!string.IsNullOrWhiteSpace(param.Ups))
+                {
+                    critical_ups = data.Ups.FirstOrDefault(x => x.Id == (int.Parse(param.Ups) + 22).ToString());
+                    if (critical_ups == null)
+                    {
+                        throw new Exception($"Для уставок {param.Description} ID УПС для critical alarm не определен.");
+                    }
+                }               
+                var criticalAlarmGroup = !string.IsNullOrWhiteSpace(param.Ups)
+                    ? $"alarm_group=\"{critical_ups.AlarmGroup}\" "
+                    : string.Empty;
                 var suffix = string.Empty;
                 var type = string.Empty;
                 var atr = string.Empty;

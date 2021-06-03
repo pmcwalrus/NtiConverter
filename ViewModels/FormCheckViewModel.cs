@@ -44,7 +44,17 @@ namespace NtiConverter.ViewModels
             {
                 Settings = SettingsFunctions.LoadObjectFromJson<FormCheckSettings>(FormCheckSettings.FormCheckSettingsFileName);
                 if (!string.IsNullOrWhiteSpace(Settings.XmlFileName))
-                    ReadFormsFromXml();
+                {
+                    try
+                    {
+                        ReadFormsFromXml();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"{ex.Message}\r\n\r\n{ex.StackTrace}",
+                            "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
             }            
             Settings.PropertyChanged += SettingsPropertyChanged;
         }
@@ -52,7 +62,15 @@ namespace NtiConverter.ViewModels
         private void SettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName != "XmlFileName") return;
-            ReadFormsFromXml();
+            try
+            {
+                ReadFormsFromXml();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}\r\n\r\n{ex.StackTrace}",
+                    "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void ReadFormsFromXml()
