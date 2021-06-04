@@ -585,6 +585,22 @@ namespace NtiConverter.Functions
                 && ((string)x.Attribute("name")).Count(c => c == '_') == 1).ToList();
             var formsWithScripts = forms.Where(x => !string.IsNullOrWhiteSpace((string)x.Attribute("script"))).ToList();
 
+            var alarmsWithWrongGourp = GetAlarmsWithWrongGroup(alarms);
+            if (alarmsWithWrongGourp.Count > 0)
+            {
+                foreach (var a in alarmsWithWrongGourp)
+                    sb.AppendLine($"Alarm {(string)a.Element.Attribute("name")} входит в неверную группу ({a.Group})!");
+                sb.AppendLine();
+            }
+
+            var cAlarmsWithWrongGourp = GetCriticalAlarmsWithWrongGroup(alarms);
+            if (cAlarmsWithWrongGourp.Count > 0)
+            {
+                foreach (var a in cAlarmsWithWrongGourp)
+                    sb.AppendLine($"Critical alarm {(string)a.Element.Attribute("name")} входит в неверную группу ({a.Group})!");
+                sb.AppendLine();
+            }
+
             var alarmsWithoutUps = GetAlarmsWithoutScripts(alarms, upsWithScripts);
             if (alarmsWithoutUps.Count > 0)
             {
@@ -608,6 +624,32 @@ namespace NtiConverter.Functions
                 sb.Append(FindNotAlarmScripts(parms, u));
 
             return sb.ToString();
+        }
+
+        public static List<(XElement Element, string Group)> GetAlarmsWithWrongGroup(List<XElement> allAlarms)
+        {
+            var alarms = allAlarms.Where(x => (string)x.Attribute("type") == "alarm");
+            var result = new List<(XElement, string)>();
+            foreach (var alarm in alarms)
+            {
+                var group = (string)alarm.Attribute("alarm_group");
+                if (group == "4" || group == "5" || group == "7") continue;
+                result.Add((alarm, group));
+            }
+            return result;
+        }
+
+        public static List<(XElement Element, string Group)> GetCriticalAlarmsWithWrongGroup(List<XElement> allAlarms)
+        {
+            var alarms = allAlarms.Where(x => (string)x.Attribute("type") == "critical_alarm");
+            var result = new List<(XElement, string)>();
+            foreach (var alarm in alarms)
+            {
+                var group = (string)alarm.Attribute("alarm_group");
+                if (group == "1" || group == "2" || group == "3") continue;
+                result.Add((alarm, group));
+            }
+            return result;
         }
 
         public static List<XElement> GetAlarmsWithoutScripts(List<XElement> alarms, List<XElement> parmsWithScripts)
