@@ -8,62 +8,71 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
-            <ColumnDefinition Width="1*"/>
-        </Grid.ColumnDefinitions>
-        <GroupBox Margin="5"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Margin="5"
                   Grid.Column="0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Button Grid.Row="0"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
                         Margin="5"
                         Content="Сформировать XML"
                         IsEnabled="{Binding Reader.BaseParsed}"
                         Command="{Binding SaveXmlCmd}"/>
-                <Button Grid.Row="1"
+                    <Button Grid.Row="1"
                         Margin="5"
                         IsEnabled="{Binding Reader.BaseParsed}"
                         Command="{Binding CheckSignalListCmd}"
                         Content="Проверить перечень"/>
-                <Button Grid.Row="2"
+                    <Button Grid.Row="2"
                         Margin="5"
                         Content="Проверить раскладку"
                         IsEnabled="{Binding Reader.BaseParsed}"
                         Command="{Binding CheckLayoutCmd}"/>
-                <Button Grid.Row="3"
+                    <Button Grid.Row="3"
                         Margin="5"
                         Content="Анализ alarm'ов"
                         IsEnabled="True"
                         Command="{Binding AnalyzeXmlCmd}"/>
-            </Grid>
-        </GroupBox>
-        <TabControl Grid.Row="0"
+                </Grid>
+            </GroupBox>
+            <TabControl Grid.Row="0"
                     Grid.Column="1"
                     Margin="5"
                     Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
-            <TabItem Header="Перечень"
+                <TabItem Header="Перечень"
                      mah:HeaderedControlHelper.HeaderFontSize="22">
-                <local:SignalViewerControl/>
-            </TabItem>
-            <TabItem Header="Анализ alarm'ов"
+                    <local:SignalViewerControl/>
+                </TabItem>
+                <TabItem Header="Анализ alarm'ов"
                      mah:HeaderedControlHelper.HeaderFontSize="22">
-                <TextBox Margin="5"
+                    <TextBox Margin="5"
                          IsReadOnly="True"
                          VerticalContentAlignment="Top"
                          HorizontalContentAlignment="Left"
                          VerticalScrollBarVisibility="Auto"
                          Text="{Binding XmlAlarmAnalyzeResult}"/>
-            </TabItem>
-            <TabItem Header="Анализ форм"
+                </TabItem>
+                <TabItem Header="Анализ форм"
                      mah:HeaderedControlHelper.HeaderFontSize="22">
-                <local:FormCheckControl/>
-            </TabItem>
-        </TabControl>
+                    <local:FormCheckControl/>
+                </TabItem>
+            </TabControl>
+        </Grid>
+        <ProgressBar Grid.Row="1"
+                     Margin="2"
+                     Value="{Binding ProgressValue}"/>
     </Grid>
 </UserControl>

@@ -5,8 +5,10 @@ using NtiConverter.Functions;
 using NtiConverter.Views;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Vab.WpfCommands.Commands;
@@ -43,17 +45,38 @@ namespace NtiConverter.ViewModels
             OpenXlsxFile(ofd.FileName);
         }
 
-        public void OpenXlsxFile(string fileName)
+        public async void OpenXlsxFile(string fileName)
         {
+            ProgressValue = 0;
+            Progress<int> progress = new Progress<int>();
+            progress.ProgressChanged += Progress_ProgressChanged;
             try
             {
-                Reader.OpenFile(fileName);
+                await Task.Run(() => Reader.OpenFile(fileName, progress));                
+                ProgressValue = 0;
             }
             catch (Exception e)
             {
                 MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}",
                     "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+                ProgressValue = 0;
             }
+        }
+
+        private int _progressValue = 0;
+        public int ProgressValue
+        {
+            get => _progressValue;
+            set
+            {
+                _progressValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void Progress_ProgressChanged(object sender, int e)
+        {
+            ProgressValue = e;
         }
 
         public ICommand ShowSettingsWindowCmd { get; }
