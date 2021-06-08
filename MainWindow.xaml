@@ -9,7 +9,7 @@
                   xmlns:views="clr-namespace:NtiConverter.Views"
                   WindowStartupLocation="CenterScreen"
                   mc:Ignorable="d"
-                  Title="NTI Converter 0.1.12" Height="450" Width="800"
+                  Title="NTI Converter 0.1.14" Height="450" Width="800"
                   Drop="MetroWindow_Drop"
                   AllowDrop="True">
     <mah:MetroWindow.DataContext>

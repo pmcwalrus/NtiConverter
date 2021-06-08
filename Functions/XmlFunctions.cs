@@ -441,7 +441,6 @@ namespace NtiConverter.Functions
                 && !param.Is420mA
                 ? $"update_threshold=\"{param.UpdateTreshold}\" "
                 : string.Empty;
-            var paramName = $"{param.SystemId}_{param.SignalId}";
             var memchange = param.Is420mA 
                 || param.UpdateTreshold.ToLower().Contains("no") 
                 ? "mem_change=\"false\" " 
@@ -455,15 +454,15 @@ namespace NtiConverter.Functions
                 ? alarmGroup
                 : string.Empty;
 
-            sb.AppendLine($"\t\t<parm name=\"{paramName}\" " +
+            sb.AppendLine($"\t\t<parm name=\"{param.Name}\" " +
                 $"type=\"{param.TypeString}\" {updateTreshold}{inverted}{memchange}{alarmString}{script}" +
                 $"description=\"{param.Description}\"/>");
 
 
             if (param.Is420mA)
             {
-                var f0String = $"\t\t<parm name=\"{paramName}_f0\" " +
-                    $"type=\"alarm\" script=\"({paramName} &lt; -1250) || ({paramName} &gt; 11250)\"  " +
+                var f0String = $"\t\t<parm name=\"{param.Name}_f0\" " +
+                    $"type=\"alarm\" script=\"({param.Name} &lt; -1250) || ({param.Name} &gt; 11250)\"  " +
                     $"{alarmGroup}description=\"{param.Description} Отказ датчика\"/>";
                 sb.AppendLine(f0String);
             }
@@ -476,8 +475,8 @@ namespace NtiConverter.Functions
                         ? $"update_threshold=\"{param.UpdateTreshold}\" "
                         : $"update_threshold=\"0.1\" ";
                 }
-                var unitsString = $"\t\t<parm name=\"{paramName}_u\" type=\"{param.TypeString}\" " +
-                    $"script=\"alg.interpolation({paramName}, x1_{paramName}, y1_{paramName})\" " +
+                var unitsString = $"\t\t<parm name=\"{param.Name}_u\" type=\"{param.TypeString}\" " +
+                    $"script=\"alg.interpolation({param.Name}, x1_{param.Name}, y1_{param.Name})\" " +
                     $"{updateTreshold420}description=\"{param.Description} в {param.Units}\"/>";
                 sb.AppendLine(unitsString);
             }
@@ -549,9 +548,9 @@ namespace NtiConverter.Functions
                         var dTimeMs = (int)(delayTimeDouble * 1000);
                         delayOn = $"delay_on=\"{dTimeMs}\" ";
                     }
-                    var setpointString = $"\t\t<parm name=\"{paramName}_{suffix}\" " +
+                    var setpointString = $"\t\t<parm name=\"{param.Name}_{suffix}\" " +
                         $"type=\"{type}\" {delayOn}" +
-                        $"script=\"{paramName}_u {atr}={param.SetpointValues[i]}\" {alarm}" +
+                        $"script=\"{param.Name}_u {atr}={param.SetpointValues[i]}\" {alarm}" +
                         $"description=\"{param.Description} {descriptionLevel}\"/>";
                     sb.AppendLine(setpointString);
                 }
