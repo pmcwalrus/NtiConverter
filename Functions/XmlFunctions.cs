@@ -353,19 +353,44 @@ namespace NtiConverter.Functions
         {
             var sb = new StringBuilder();
             var shmemList = GetShmemList(data);
-            foreach (var shmem in shmemList)
+            foreach (var shmemName in shmemList)
             {
+                var shmem = data.Shmems.FirstOrDefault(x => x.Name == shmemName);
+                if (shmem == null)
+                {
+                    MessageBox.Show($"Shmem {shmemName} не будет создан, т.к. отсутствует на листе shmems", "WARNING",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    continue;
+                }
                 sb.AppendLine(GetSingleShemem(data, shmem));
                 sb.Append("\r\n");
             }
             return sb.ToString();
         }
 
-        public static string GetSingleShemem(NtiBase data, string shmem)
+        public static string GetSingleShemem(NtiBase data, ShmemEntity shmem)
         {
             var sb = new StringBuilder();
-            sb.AppendLine($"\t<shmem name=\"{shmem}\" stale_timeout=\"45000\">");
-            sb.AppendLine(GetShmemParams(data, shmem));
+            var type = string.IsNullOrWhiteSpace(shmem.Type)
+                ? string.Empty
+                : $"type=\"{shmem.Type}\" ";
+            var staleTimeout = string.IsNullOrWhiteSpace(shmem.StaleTimeout)
+                ? string.Empty
+                : $"stale_timeout=\"{shmem.StaleTimeout}\" ";
+            var keepalive = string.IsNullOrWhiteSpace(shmem.KeepAlive)
+                ? string.Empty
+                : $"keepalive=\"{shmem.KeepAlive}\" ";
+            var logging = string.IsNullOrWhiteSpace(shmem.Logging)
+                ? string.Empty
+                : $"logging=\"{shmem.Logging}\" ";
+            var keepTime = string.IsNullOrWhiteSpace(shmem.KeepTime)
+                ? string.Empty
+                : $"keep_time=\"{shmem.KeepTime}\" ";
+            var keepMb = string.IsNullOrWhiteSpace(shmem.KeepMb)
+                ? string.Empty
+                : $"keep_mb=\"{shmem.KeepMb}\" ";
+            sb.AppendLine($"\t<shmem name=\"{shmem.Name}\" {type}{staleTimeout}{keepalive}{logging}{keepTime}{keepMb}>");
+            sb.AppendLine(GetShmemParams(data, shmem.Name));
             sb.AppendLine($"\t</shmem>");
             return sb.ToString();
         }
