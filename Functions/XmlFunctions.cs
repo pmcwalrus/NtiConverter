@@ -143,12 +143,12 @@ namespace NtiConverter.Functions
             {
                 if (parm.Type == SignalTypes.Alarm || parm.Type == SignalTypes.CritcalAlarm)
                     parmsString += string.IsNullOrEmpty(parmsString)
-                        ? $"{parm.SystemId}_{parm.SignalId} "
-                        : $"| {parm.SystemId}_{parm.SignalId} ";
+                        ? $"{parm.Name} "
+                        : $"| {parm.Name} ";
                 if (parm.Is420mA)
                     parmsString += string.IsNullOrEmpty(parmsString)
-                        ? $"{parm.SystemId}_{parm.SignalId}_f0 "
-                        : $"| {parm.SystemId}_{parm.SignalId}_f0 ";
+                        ? $"{parm.Name}_f0 "
+                        : $"| {parm.Name}_f0 ";
                 if (parm.SetpointTypes != null)
                 {
                     foreach (var sp in parm.SetpointTypes)
@@ -171,8 +171,8 @@ namespace NtiConverter.Functions
                                 break;
                         }
                         parmsString += string.IsNullOrEmpty(parmsString)
-                            ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
-                            : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
+                            ? $"{parm.Name}_{suffix} "
+                            : $"| {parm.Name}_{suffix} ";
                     }
                 }
             }
@@ -199,8 +199,8 @@ namespace NtiConverter.Functions
                                 continue;
                         }
                         parmsString += string.IsNullOrEmpty(parmsString)
-                            ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
-                            : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
+                            ? $"{parm.Name}_{suffix} "
+                            : $"| {parm.Name}_{suffix} ";
                     }
                 }
             }
@@ -222,8 +222,8 @@ namespace NtiConverter.Functions
                 {
                     if (parm.Type == SignalTypes.Alarm || parm.Type == SignalTypes.CritcalAlarm)
                         parmsString += string.IsNullOrEmpty(parmsString)
-                            ? $"{parm.SystemId}_{parm.SignalId} "
-                            : $"| {parm.SystemId}_{parm.SignalId} ";
+                            ? $"{parm.Name} "
+                            : $"| {parm.Name} ";
                     if (parm.SetpointTypes != null)
                     {
                         foreach (var sp in parm.SetpointTypes)
@@ -248,15 +248,15 @@ namespace NtiConverter.Functions
                                     break;
                             }
                             parmsString += string.IsNullOrEmpty(parmsString)
-                                ? $"{parm.SystemId}_{parm.SignalId}_{suffix} "
-                                : $"| {parm.SystemId}_{parm.SignalId}_{suffix} ";
+                                ? $"{parm.Name}_{suffix} "
+                                : $"| {parm.Name}_{suffix} ";
                         }
                     }
                     if (parm.Is420mA)
                     {
                         parmsString += string.IsNullOrEmpty(parmsString)
-                                ? $"{parm.SystemId}_{parm.SignalId}_f0 "
-                                : $"| {parm.SystemId}_{parm.SignalId}_f0 ";
+                                ? $"{parm.Name}_f0 "
+                                : $"| {parm.Name}_f0 ";
                     }
                 }
                 var script = string.IsNullOrEmpty(parmsString) ? string.Empty : $" script=\"{parmsString}\"";
@@ -344,7 +344,7 @@ namespace NtiConverter.Functions
                 else if (signal.Type.Contains("AO")) modbusType = "0x03";
                 else modbusType = "???";
                 sb.AppendLine($"\t\t<address start_addr=\"{signal.NumberStr}\" " +
-                    $"type=\"{modbusType}\" parm=\"{param.SystemId}_{param.SignalId}\"/>");
+                    $"type=\"{modbusType}\" parm=\"{param.Name}\"/>");
             }
             return sb.ToString();
         }
