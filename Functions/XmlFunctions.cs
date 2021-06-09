@@ -333,7 +333,8 @@ namespace NtiConverter.Functions
         {
             var sb = new StringBuilder();
             var signals = data.Layout.Where(x => x.DeviceIndex == deviceName).ToList();
-            foreach (var signal in signals)
+            var ascendingSignals = signals.OrderBy(x => Convert.ToInt32(x.NumberStr));
+            foreach (var signal in ascendingSignals)
             {
                 var param = data.Signals.FirstOrDefault(x => x.Index == signal.SignalName);
                 if (param == null) continue;
