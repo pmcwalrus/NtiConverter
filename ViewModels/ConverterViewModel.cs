@@ -5,7 +5,6 @@ using NtiConverter.Functions;
 using NtiConverter.Views;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +28,7 @@ namespace NtiConverter.ViewModels
             AnalyzeXmlCmd = new RelayCommand(() => AnalyzeXml());
             CheckLayoutCmd = new RelayCommand(() => CheckLayout());
             CheckSignalListCmd = new RelayCommand(() => CheckSignalList());
+            GetDoubleParamsCmd = new RelayCommand(() => GetDoubleParams());
         }
 
         #region Select XLSX
@@ -143,6 +143,35 @@ namespace NtiConverter.ViewModels
             catch (Exception e)
             {
                 MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}", 
+                    "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        public ICommand GetDoubleParamsCmd { get; }
+        private void GetDoubleParams()
+        {
+            var ofd = new OpenFileDialog
+            {
+                Filter = "XML | *.xml"
+            };
+            var dRes = ofd.ShowDialog();
+            if (!dRes.HasValue || !dRes.Value) return;
+            try
+            {
+                var result = XmlFunctions.FindDoubleParams(ofd.FileName);
+                if (string.IsNullOrWhiteSpace(result))
+                {
+                    MessageBox.Show($"Нет дублирующих параметров",
+                        "GOOD JOB!", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+                var win = new MessageTextWindow();
+                win.Tb.Text = result.ToString();
+                win.ShowDialog();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show($"{e.Message}\r\n\r\n{e.StackTrace}",
                     "ERROR!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

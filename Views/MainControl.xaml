@@ -25,6 +25,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Button Grid.Row="0"
                         Margin="5"
@@ -46,6 +47,11 @@
                         Content="Анализ alarm'ов"
                         IsEnabled="True"
                         Command="{Binding AnalyzeXmlCmd}"/>
+                    <Button Grid.Row="4"
+                            Margin="5"
+                            Content="Найти дубликаты"
+                            IsEnabled="True"
+                            Command="{Binding GetDoubleParamsCmd}"/>
                 </Grid>
             </GroupBox>
             <TabControl Grid.Row="0"

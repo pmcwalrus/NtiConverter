@@ -593,6 +593,26 @@ namespace NtiConverter.Functions
 
         #region XML Analyze
 
+        public static string FindDoubleParams(string fileName)
+        {
+            using var sr = new StreamReader(fileName);
+            var fileData = sr.ReadToEnd();
+            var xmlData = XDocument.Parse(fileData);
+            var sb = new StringBuilder();
+            var parms = xmlData.Descendants("parm").ToList();
+            var doubleParams = new List<string>();
+            foreach (var parm in parms)
+            {
+                var name = (string)parm.Attribute("name");
+                if (doubleParams.Contains(name)) continue;
+                var count = parms.Count(x => (string)x.Attribute("name") == name);
+                if (count <= 1) continue;
+                doubleParams.Add(name);
+                sb.AppendLine($"{name}: {count}");
+            }
+            return sb.ToString();
+        }
+
         public static string AnalyzeXml(string fileName)
         {
             using var sr = new StreamReader(fileName);
