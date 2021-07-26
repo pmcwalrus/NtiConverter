@@ -131,12 +131,14 @@ namespace NtiConverter.Functions
             "\t\t<parm name=\"mute_sound\" type=\"bool\" script=\"alg.reset_after_timeout('mute', qs_mute_fn(SYS_new_alarm, btn_mute, mute_sound), 30000)\"/>";
         }
 
+        private const int AlarmOffset = 23;
+
         public static string GetUps(NtiBase data, UpsEntity ups)
         {
             var parmsString = string.Empty;
             var parms = data.Signals.Where(x => x.Ups == ups.Id);
             var parmsCritical = data.Signals.Where(x => !string.IsNullOrWhiteSpace(x.Ups) 
-            && ((int.Parse(x.Ups) + 22).ToString() == ups.Id) 
+            && ((int.Parse(x.Ups) + AlarmOffset).ToString() == ups.Id) 
             && x.SetpointTypes != null
             && (x.SetpointTypes.Contains(SetpointTypes.HH) || x.SetpointTypes.Contains(SetpointTypes.LL)));
             foreach (var parm in parms)
@@ -486,7 +488,7 @@ namespace NtiConverter.Functions
                 UpsEntity critical_ups = null; ;
                 if (!string.IsNullOrWhiteSpace(param.Ups))
                 {
-                    critical_ups = data.Ups.FirstOrDefault(x => x.Id == (int.Parse(param.Ups) + 22).ToString());
+                    critical_ups = data.Ups.FirstOrDefault(x => x.Id == (int.Parse(param.Ups) + AlarmOffset).ToString());
                     if (critical_ups == null)
                     {
                         throw new Exception($"Для уставок {param.Description} ID УПС для critical alarm не определен.");
